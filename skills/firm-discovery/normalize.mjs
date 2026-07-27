@@ -2,8 +2,9 @@
 // Edit the source and re-run: npm run sync:skills
 
 /**
- * Shared normalization helpers used by Stage 01 discovery and the audit
- * promote endpoint. Keeps dedup logic identical across both code paths.
+ * Shared normalization helpers for firm discovery. Canonical source: synced
+ * verbatim into skills/firm-discovery/normalize.mjs (see skills/sync-manifest.json),
+ * so dedup logic stays identical between this source and the bundled skill copy.
  */
 
 // Only legal-entity boilerplate goes here — words that are interchangeable and

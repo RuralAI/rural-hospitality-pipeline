@@ -1,7 +1,8 @@
 /**
  * Loads Region Travel: written by client-onboarding's travel-research step into
- * region-travel.json. A row's mere presence IS the human approval (same implicit
- * gate the old Next.js UI used) -- no verified/confidence flags to check here.
+ * region-travel.json. A row's mere presence IS the human approval: onboarding only
+ * writes a row after the operator approves it, so there are no verified/confidence
+ * flags to check here.
  * Missing/empty for a region is an expected steady state: fall back to a generic,
  * no-transit-claim sentence built from Business Profile's location.
  */

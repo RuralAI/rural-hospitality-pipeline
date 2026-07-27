@@ -31,7 +31,7 @@ One optional skill:
 ## Getting started
 
 1. Read **[docs/getting-started.md](docs/getting-started.md)** for the full run-through (accounts, connectors, and API keys you'll need).
-2. Set up your Airtable base — **[docs/new-user-airtable-setup-guide.md](docs/new-user-airtable-setup-guide.md)** (or let `client-onboarding` provision it for you).
+2. Connect the **Airtable** connector with **workspace-level** access. Do not pre-create a base — `client-onboarding` creates it for you, so there is nothing to build by hand.
 3. Install the skills: in Claude, go to **Settings → Skills → Add Skill** and upload the `.skill` files from **[`dist/`](dist/)**.
 4. Run `client-onboarding`, then `voice-intake`, then the four pipeline skills in order.
 
@@ -46,14 +46,18 @@ There is also a visual walkthrough at **[docs/pilot-walkthrough.html](docs/pilot
 
 ---
 
-## Repository layout
+## For maintainers
+
+Nothing below is needed to *run* the pipeline — running it takes a Claude project, the two
+connectors, and the `.skill` files from `dist/`. This is the tooling for changing the skills
+and rebuilding them.
 
 ```
 skills/       the skills (each SKILL.md + its bundled scripts and tests)
 dist/         packaged .skill files — install these into Claude
 config/       example client data + the shared Airtable schema
 src/          canonical source for the logic the skills bundle (see below)
-scripts/      sync, packaging, and Airtable provisioning utilities
+scripts/      sync, packaging, and the maintainer-only Airtable provisioning script
 docs/         setup guides, schema reference, and the walkthrough
 ```
 
@@ -69,6 +73,14 @@ npm test                   # unit tests + the drift check
 ```
 
 `npm test` runs on Node's built-in test runner — this repo has **no runtime dependencies**. See [docs/skills-bundled-copy-drift.md](docs/skills-bundled-copy-drift.md) for details.
+
+### Applying the schema to an existing base
+
+`npm run setup:airtable` writes the schema in `config/airtable-schema.mjs` to a base over the
+Airtable REST API, using an `.env.local` you create from [`.env.example`](.env.example). It is
+a maintainer escape hatch for a full field-level reconcile — **operators never need it**, since
+`client-onboarding` provisions the base through the connector. See
+[docs/airtable-schema.md](docs/airtable-schema.md#provisioning).
 
 ---
 

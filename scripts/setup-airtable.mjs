@@ -1,8 +1,15 @@
 /**
- * One-time setup script — creates the pipeline tables (Firms, Contacts,
- * Outreach, Email Templates, Region Travel, Region Naming, Config, and
- * Business Profile; plus Review in the with-review variant) in your Airtable
- * base with the correct field names and types.
+ * MAINTAINER TOOL — not part of the operator run flow.
+ *
+ * Operators provision their base with the `client-onboarding` skill, which does
+ * this over the Airtable connector and needs no checkout, no Node, and no token.
+ * Use this script only to apply the schema to a base you already have (e.g. a
+ * full field-level reconcile, which onboarding's top-up path does not do).
+ *
+ * Creates the pipeline tables (Firms, Contacts, Outreach, Email Templates,
+ * Region Travel, Region Naming, Config, and Business Profile; plus Review in the
+ * with-review variant) in the target Airtable base with the correct field names
+ * and types.
  *
  * Usage:
  *   node --env-file=.env.local scripts/setup-airtable.mjs [--variant basic|with-review]
