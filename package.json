@@ -1,0 +1,17 @@
+{
+  "name": "rural-hospitality-pipeline",
+  "version": "1.0.0",
+  "description": "Reusable Claude Skills pipeline for rural hospitality outreach: discover firms, review, extract contacts, and draft outreach email. Center for Rural AI.",
+  "license": "CC-BY-4.0",
+  "private": false,
+  "scripts": {
+    "setup:airtable": "node --env-file=.env.local scripts/setup-airtable.mjs",
+    "sync:skills": "node scripts/sync-skills.mjs",
+    "sync:skills:check": "node scripts/sync-skills.mjs --check",
+    "package:skills": "scripts/package-skill.sh --all",
+    "test": "node --test '**/*.test.mjs'"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,11 @@
+[
+  { "from": "src/lib/normalize.js",              "to": "skills/firm-discovery/normalize.mjs" },
+  { "from": "src/pipeline/stage-02-extraction.js", "to": "skills/contact-extraction/stage-02-extraction.mjs" },
+  { "from": "src/pipeline/stage-02-hunter.js",     "to": "skills/contact-extraction/stage-02-hunter.js" },
+  { "from": "src/pipeline/stage-02-merge.js",      "to": "skills/contact-extraction/merge.mjs" },
+  { "from": "config/email-templates.js",         "to": "skills/email-generation/email-templates.mjs" },
+  { "from": "config/region-travel.js",           "to": "skills/email-generation/region-travel.mjs" },
+  { "from": "config/region-naming.js",           "to": "skills/email-generation/region-naming.mjs" },
+  { "from": "config/client-data.json",           "to": "skills/email-generation/client-data.json" },
+  { "from": "config/airtable-schema.mjs",        "to": "skills/client-onboarding/table-schema.mjs" }
+]

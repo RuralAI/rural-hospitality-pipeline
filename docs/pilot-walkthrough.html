@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running Your Outreach Pilot in Claude</title>
+
+<style>
+  :root {
+    --paper: #F2F4F0;
+    --surface: #FFFFFF;
+    --surface-2: #EAEEE8;
+    --ink: #1E2A25;
+    --muted: #5B6B63;
+    --accent: #2E6B57;
+    --accent-strong: #245544;
+    --accent-soft: #E2EEE8;
+    --amber: #9A6A15;
+    --amber-soft: #F5EBD6;
+    --hair: #D8DFD7;
+    --shadow: 0 1px 2px rgba(30,42,37,.06), 0 6px 20px rgba(30,42,37,.05);
+    --radius: 14px;
+    --measure: 64ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #13181A;
+      --surface: #1B2124;
+      --surface-2: #232B2D;
+      --ink: #E7EDE9;
+      --muted: #9DB0A7;
+      --accent: #63BC9E;
+      --accent-strong: #7FCBB1;
+      --accent-soft: #1D302A;
+      --amber: #DCB059;
+      --amber-soft: #2A2417;
+      --hair: #2B3331;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #F2F4F0; --surface: #FFFFFF; --surface-2: #EAEEE8;
+    --ink: #1E2A25; --muted: #5B6B63; --accent: #2E6B57; --accent-strong: #245544;
+    --accent-soft: #E2EEE8; --amber: #9A6A15; --amber-soft: #F5EBD6; --hair: #D8DFD7;
+    --shadow: 0 1px 2px rgba(30,42,37,.06), 0 6px 20px rgba(30,42,37,.05);
+  }
+  :root[data-theme="dark"] {
+    --paper: #13181A; --surface: #1B2124; --surface-2: #232B2D;
+    --ink: #E7EDE9; --muted: #9DB0A7; --accent: #63BC9E; --accent-strong: #7FCBB1;
+    --accent-soft: #1D302A; --amber: #DCB059; --amber-soft: #2A2417; --hair: #2B3331;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .serif {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* Hero */
+  header.hero {
+    padding: 64px 0 40px;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-size: .74rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+    margin: 0 0 18px;
+    font-weight: 600;
+  }
+  .lede {
+    font-size: 1.18rem;
+    color: var(--muted);
+    max-width: var(--measure);
+    margin: 0 0 26px;
+  }
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    align-items: center;
+    font-size: .95rem;
+    color: var(--ink);
+  }
+  .flow span { display: inline-flex; align-items: center; gap: 8px; }
+  .flow .dot { color: var(--accent); font-weight: 700; }
+  .flow .arw { color: var(--muted); }
+
+  /* Layout with sticky nav */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  @media (min-width: 900px) {
+    .cols { grid-template-columns: 232px 1fr; gap: 56px; align-items: start; }
+    nav.toc { position: sticky; top: 24px; }
+  }
+  nav.toc h2 {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  nav.toc ol { list-style: none; margin: 0 0 22px; padding: 0; }
+  nav.toc li { margin: 0; }
+  nav.toc a {
+    display: block;
+    padding: 7px 10px;
+    border-radius: 8px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: .93rem;
+    border: 1px solid transparent;
+  }
+  nav.toc a:hover { background: var(--surface-2); }
+  nav.toc a .n {
+    display: inline-block;
+    width: 1.4em;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  section.block { margin-bottom: 48px; scroll-margin-top: 24px; }
+  .kicker {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 0 0 6px;
+  }
+  .kicker .tag {
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .tag.once { color: var(--amber); background: var(--amber-soft); }
+  .tag.repeat { color: var(--accent); background: var(--accent-soft); }
+  h2.sec {
+    font-size: 1.55rem;
+    letter-spacing: -.01em;
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+  .sec-sub { color: var(--muted); margin: 0 0 24px; max-width: var(--measure); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 22px 20px;
+    margin-bottom: 16px;
+  }
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .step-n {
+    flex: none;
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 1.02rem;
+    font-variant-numeric: tabular-nums;
+  }
+  :root[data-theme="dark"] .step-n { color: #0E1512; }
+  @media (prefers-color-scheme: dark) { .step-n { color: #0E1512; } }
+  :root[data-theme="light"] .step-n { color: #fff; }
+  .card h3 { font-size: 1.16rem; margin: 3px 0 0; font-weight: 600; letter-spacing: -.005em; }
+  .card .role { color: var(--muted); font-size: .95rem; margin: 6px 0 0; }
+
+  .card-body { padding-left: 48px; }
+  @media (max-width: 520px) { .card-body { padding-left: 0; } }
+
+  /* Say-this block */
+  .say {
+    margin: 16px 0 14px;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .say-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--hair);
+  }
+  .say-text {
+    padding: 13px 14px;
+    font-size: .97rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .copy {
+    font: inherit;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .copy:hover { background: var(--accent); color: var(--surface); }
+  :root[data-theme="dark"] .copy:hover { color: #0E1512; }
+  .copy:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+  .copy.done { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+  :root[data-theme="dark"] .copy.done { color: #0E1512; }
+  .copy.fail { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
+
+  .result {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    font-size: .96rem;
+    margin-top: 12px;
+  }
+  .result dt {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .74rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding-top: 3px;
+    white-space: nowrap;
+  }
+  .result dd { margin: 0; }
+
+  /* Setup checklist */
+  ul.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  ul.check li {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  ul.check .mark {
+    margin-top: 2px;
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    display: grid; place-items: center;
+    font-size: .8rem; font-weight: 700;
+    flex: none;
+  }
+  ul.check strong { font-weight: 600; }
+  ul.check .sub { color: var(--muted); font-size: .93rem; }
+
+  /* Callout */
+  .note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    background: var(--amber-soft);
+    border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
+    border-radius: 10px;
+    padding: 13px 15px;
+    margin: 14px 0 0;
+    font-size: .95rem;
+  }
+  .note .ic { color: var(--amber); font-weight: 700; }
+  .note.good { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+  .note.good .ic { color: var(--accent); }
+
+  .tip-row { display: grid; gap: 12px; margin-top: 8px; }
+  @media (min-width: 640px) { .tip-row { grid-template-columns: 1fr 1fr; } }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hair);
+    color: var(--muted);
+    font-size: .88rem;
+  }
+  code.inline {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .86em;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid var(--hair);
+  }
+  a.lnk { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
+  a.lnk:hover { color: var(--accent-strong); }
+  a.lnk:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; border-radius: 3px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Center for Rural AI · Hospitality Outreach Pilot</p>
+    <h1 class="serif">Reach the right planners, in your own words.</h1>
+    <p class="lede">You interact with Claude in plain language. It does the research and writes the emails. You review and send. This is the whole thing, start to finish.</p>
+    <div class="flow">
+      <span><span class="dot">1</span> Set up once</span>
+      <span class="arw">→</span>
+      <span><span class="dot">2</span> Find planners</span>
+      <span class="arw">→</span>
+      <span><span class="dot">3</span> Get contacts</span>
+      <span class="arw">→</span>
+      <span><span class="dot">4</span> Review drafts &amp; send</span>
+    </div>
+  </header>
+
+  <div class="cols">
+    <nav class="toc" aria-label="Contents">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#keys"><span class="n">·</span>Before you begin</a></li>
+        <li><a href="#how"><span class="n">·</span>How it works</a></li>
+        <li><a href="#setup"><span class="n">·</span>Set up once</a></li>
+        <li><a href="#find"><span class="n">1</span>Find planners</a></li>
+        <li><a href="#keep"><span class="n">2</span>Keep the good ones</a></li>
+        <li><a href="#contacts"><span class="n">3</span>Get contact info</a></li>
+        <li><a href="#drafts"><span class="n">4</span>Write the emails</a></li>
+        <li><a href="#send"><span class="n">·</span>Review &amp; send</a></li>
+        <li><a href="#know"><span class="n">·</span>Good to know</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <!-- PREREQ KEYS -->
+      <section class="block" id="keys">
+        <div class="kicker"><span class="tag once">Do this first</span></div>
+        <h2 class="sec serif">Before you begin: get your two keys</h2>
+        <p class="sec-sub">Two quick, free signups that happen outside Claude. They take the longest, so grab them before you start and you won't have to stop partway through. Copy each key somewhere handy, like a notes app.</p>
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">S</div>
+            <div>
+              <h3>Serper &mdash; required</h3>
+              <p class="role">Powers the planner search (used at Step 1).</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <ul class="check">
+              <li><span class="mark">1</span><span>Go to <a class="lnk" href="https://serper.dev" target="_blank" rel="noopener">serper.dev</a> and sign up &mdash; free, no credit card (Google sign-in works). You start with 2,500 free searches.</span></li>
+              <li><span class="mark">2</span><span>Open your dashboard and click <strong>API Key</strong> in the left sidebar.</span></li>
+              <li><span class="mark">3</span><span>Copy the key and keep it handy. You'll paste it when <strong>Step 1 (Find planners)</strong> asks.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">H</div>
+            <div>
+              <h3>Hunter &mdash; recommended</h3>
+              <p class="role">Finds extra contact emails (used at Step 3, pass 2).</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <ul class="check">
+              <li><span class="mark">1</span><span>Go to <a class="lnk" href="https://hunter.io" target="_blank" rel="noopener">hunter.io</a> and create a free account (email or Google).</span></li>
+              <li><span class="mark">2</span><span>Click your profile icon (top right) and choose <strong>API</strong> &mdash; or go straight to <a class="lnk" href="https://hunter.io/api-keys" target="_blank" rel="noopener">hunter.io/api-keys</a>.</span></li>
+              <li><span class="mark">3</span><span>Copy the key. You'll paste it when <strong>Step 3's pass 2</strong> asks. The free plan has a small monthly limit &mdash; your dashboard shows how many searches you have left.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="note"><span class="ic">!</span><span>Do this <strong>before</strong> you start &mdash; each signup takes a few minutes and sends you off to another site, so it's easier to knock both out now than to break your flow later.</span></div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section class="block" id="how">
+        <h2 class="sec serif">Every step is the same three moves</h2>
+        <p class="sec-sub">You never touch settings or code. For each step you paste one prompt, it goes to work, and it tells you what it did. That's the whole pattern.</p>
+        <div class="card">
+          <div class="result" style="margin-top:0">
+            <dt>Prompt Claude</dt><dd>Paste the prompt into the chat (tap <strong>Copy</strong> on any of them below).</dd>
+            <dt>Action</dt><dd>Claude does the work and shows you the result.</dd>
+            <dt>You approve</dt><dd>Look the work over. Approve or clarify the output from Claude. Then move to the next step.</dd>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETUP -->
+      <section class="block" id="setup">
+        <div class="kicker"><span class="tag once">Do once</span></div>
+        <h2 class="sec serif">Set up once</h2>
+        <p class="sec-sub">A few minutes the first time. After this, you only ever repeat steps 1&ndash;4.</p>
+
+        <div class="card">
+          <h3 style="margin-top:0">Get the project ready</h3>
+          <ul class="check" style="margin-top:14px">
+            <li><span class="mark">✓</span><span><strong>Create a new project in Claude.</strong> <span class="sub">Name it something clear like "Email Outreach." Everything below lives inside this project.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Connect Airtable and Gmail.</strong> <span class="sub">Settings → Connectors. This is where your list and your drafts live. When Airtable asks what Claude can access, choose <strong>"Everything you have access to"</strong> &mdash; Claude needs this level of access to build your base for you.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Add the skills CRAI sent you.</strong> <span class="sub">Settings → Skills → upload each file. They show up in every chat after that.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Have your two keys ready.</strong> <span class="sub">The Serper and Hunter keys from "Before you begin." When a step asks, paste the key in &mdash; nothing to set up in advance.</span></span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">A</div>
+            <div>
+              <h3>Tell Claude about your inn</h3>
+              <p class="role">Builds your workspace and saves your details.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Onboard a new client.">Copy</button></div>
+              <div class="say-text mono">Onboard a new client.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>First Claude asks two quick picks: your <strong>segment</strong> &mdash; the kind of planners you want to reach (wedding planners, corporate retreat planners, or both) &mdash; and whether this is a brand-new setup (yes, your first time). Then it interviews you about the property: name, location, how many guests you host, what makes it special, who signs the emails, and the airport guests <em>fly into</em>. Then it builds everything.</dd>
+              <dt>You approve</dt><dd>Just answer as they come &mdash; Claude asks one or two at a time, so there's nothing to fill in beforehand. Not sure on something? Say so and it'll help.</dd>
+            </dl>
+            <div class="note"><span class="ic">!</span><span>One quick click it will ask for: in the <strong>Firms</strong> table, add a field named <code class="inline">discovered-date</code> of type <strong>Created time</strong>. Once, and you're done.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">B</div>
+            <div>
+              <h3>Capture your voice</h3>
+              <p class="role">So the emails sound like you, not a template.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Capture the voice for my business and draft the outreach templates.">Copy</button></div>
+              <div class="say-text mono">Capture the voice for my business and draft the outreach templates.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude asks how you write, then drafts your email templates and shows them to you.</dd>
+              <dt>You approve</dt><dd>Read the drafts, ask for any tweaks, and approve. These become the emails you send later.</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1 FIND -->
+      <section class="block" id="find">
+        <div class="kicker"><span class="tag repeat">Repeat anytime</span></div>
+        <h2 class="sec serif">Run a campaign</h2>
+        <p class="sec-sub">These four steps are the loop you run whenever you want a fresh batch of outreach &mdash; a new city, a new season, a new segment.</p>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n">1</div>
+            <div>
+              <h3>Find planners</h3>
+              <p class="role">Searches an area for the people who book stays.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Run firm-discovery for [target city], [target segment], small sample.">Copy</button></div>
+              <div class="say-text mono">Run firm-discovery for [target city], [target segment], small sample.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude finds the planners in that area and lists them. Nothing is saved yet.</dd>
+              <dt>You approve</dt><dd>Nothing &mdash; just look. Fill in the city and segment you're targeting. Keep <strong>small sample</strong> in the prompt: it tells Claude to pull just a first batch (about one page of firms) instead of a full run, so you can check quality and spend before going bigger.</dd>
+            </dl>
+            <div class="note"><span class="ic">!</span><span>The first time you run this, Claude asks for your <strong>Serper key</strong> &mdash; paste in the one from "Before you begin." That's the search key doing the work.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 KEEP -->
+      <section class="block" id="keep">
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n">2</div>
+            <div>
+              <h3>Keep the good ones</h3>
+              <p class="role">Sorts real planners from the noise and saves them.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Review those discovery results and save the good ones to Firms.">Copy</button></div>
+              <div class="say-text mono">Review those discovery results and save the good ones to Firms.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude decides which results are genuine planners worth keeping and saves those to your list. It cross-checks each name against Google's category, so a rental company or venue that slipped in gets filtered out.</dd>
+              <dt>You approve</dt><dd>Mostly nothing &mdash; it saves the clear planners on its own. If a few are borderline (the name and Google's category disagree), Claude shows you those and asks yes or no. Just answer, and it writes the rest.</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 CONTACTS -->
+      <section class="block" id="contacts">
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n">3</div>
+            <div>
+              <h3>Get contact info</h3>
+              <p class="role">Finds email addresses for the ones you kept.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Run contact-extraction on the Firms — pass 1 (scrape).">Copy</button></div>
+              <div class="say-text mono">Run contact-extraction on the Firms &mdash; pass 1 (scrape).</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude reads each planner's website and pulls an email address where it can.</dd>
+              <dt>You approve</dt><dd>Nothing. Want more coverage? Then also run the optional pass below.</dd>
+            </dl>
+            <div class="say" style="margin-top:16px">
+              <div class="say-label"><span>Optional &middot; find more</span><button class="copy" data-copy="Run pass 2 (Hunter enrichment).">Copy</button></div>
+              <div class="say-text mono">Run pass 2 (Hunter enrichment).</div>
+            </div>
+            <div class="note"><span class="ic">!</span><span>Pass 2 uses your <strong>Hunter key</strong> &mdash; paste it in when Claude asks.</span></div>
+            <div class="note good"><span class="ic">✓</span><span>Hunter only helps for planners with their own website domain. Many small firms use a Gmail address, so pass 2 may add nothing &mdash; that's normal, not a failure.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 DRAFTS -->
+      <section class="block" id="drafts">
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n">4</div>
+            <div>
+              <h3>Write the emails</h3>
+              <p class="role">One personalized draft per contact, in your Gmail.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Create one Gmail draft per Contact — drafts only, do not send.">Copy</button></div>
+              <div class="say-text mono">Create one Gmail draft per Contact &mdash; drafts only, do not send.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude writes a tailored email to each contact &mdash; in your voice, with the right travel details &mdash; and saves them to your Gmail <strong>Drafts</strong>.</dd>
+              <dt>You approve</dt><dd>Move to the last step to review them.</dd>
+            </dl>
+            <div class="note good"><span class="ic">✓</span><span>Claude <strong>never sends</strong> anything. Every email waits in your Drafts until you send it yourself.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEND -->
+      <section class="block" id="send">
+        <div class="kicker"><span class="tag repeat">You're in control</span></div>
+        <h2 class="sec serif">Review &amp; send</h2>
+        <p class="sec-sub">The final call is always yours.</p>
+        <div class="card">
+          <ul class="check">
+            <li><span class="mark">1</span><span><strong>Open Gmail → Drafts.</strong> <span class="sub">Your new outreach emails are waiting there.</span></span></li>
+            <li><span class="mark">2</span><span><strong>Read each one.</strong> <span class="sub">Tweak anything you like &mdash; they're normal Gmail drafts.</span></span></li>
+            <li><span class="mark">3</span><span><strong>Hit send on the ones you're happy with.</strong> <span class="sub">Skip or delete any you don't want. Done.</span></span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- GOOD TO KNOW -->
+      <section class="block" id="know">
+        <h2 class="sec serif">Good to know</h2>
+        <div class="tip-row">
+          <div class="note good"><span class="ic">✓</span><span><strong>Start small.</strong> Run one city as a sample first. You'll see the quality before spending on a bigger search.</span></div>
+          <div class="note good"><span class="ic">✓</span><span><strong>Setup is one-time.</strong> Steps A and B happen once for your business. Steps 1&ndash;4 are what you repeat for each campaign.</span></div>
+          <div class="note"><span class="ic">!</span><span><strong>If a step stalls,</strong> just try it again, or reopen the project in a browser. It's usually a hiccup, not a real error.</span></div>
+          <div class="note good"><span class="ic">✓</span><span><strong>Nothing goes out without you.</strong> The pilot only ever prepares drafts. You send from your own inbox.</span></div>
+        </div>
+      </section>
+
+      <footer>
+        Center for Rural AI · Rural Hospitality Outreach Pilot. Prepared for Example Inn, Rivertown &mdash; swap in your own business name and cities as you go.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { ta.setSelectionRange(0, text.length); } catch (e) {}
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function flash(btn, label, cls) {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+    btn.textContent = label;
+    btn.classList.add(cls);
+    setTimeout(function () {
+      btn.textContent = btn.dataset.label;
+      btn.classList.remove("done", "fail");
+    }, 1800);
+  }
+
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy") || "";
+      var ok = function () { flash(btn, "Copied ✓", "done"); };
+      var no = function () {
+        // Last resort: select the visible prompt so the user can hit ⌘/Ctrl+C.
+        var block = btn.closest(".say");
+        var txt = block && block.querySelector(".say-text");
+        if (txt) {
+          var range = document.createRange();
+          range.selectNodeContents(txt);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        flash(btn, "Press ⌘/Ctrl+C", "fail");
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok, function () {
+          fallbackCopy(text) ? ok() : no();
+        });
+      } else {
+        fallbackCopy(text) ? ok() : no();
+      }
+    });
+  });
+</script>
+</body>
+</html>

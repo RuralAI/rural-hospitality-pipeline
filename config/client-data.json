@@ -1,0 +1,38 @@
+{
+  "businessName": "Example Inn",
+  "businessUrl": "https://www.example.com",
+  "location": "Rivertown, Colorado",
+  "signingName": "Alex Rivera and Sam Rivera",
+  "signature": {
+    "title": "Innkeepers, Example Inn",
+    "address": "100 Main Street, Rivertown, CO 80000",
+    "phone": "970 555 0100",
+    "website": "www.example.com"
+  },
+  "propertyContext": {
+    "capacity": "16 to 21 guests (full-property buyout)",
+    "destinationAirport": { "code": "RVT", "name": "Rivertown Regional" },
+    "highlights": [
+      "Full-property buyouts available, one group at a time, with no hotel front desk",
+      "A restored historic home a short walk from the town center, shops, and restaurants",
+      "A plated breakfast made fresh each morning, with dietary needs accommodated",
+      "Personal, in-home attention: guests are hosted, not checked in",
+      "Certified green property with refillable amenities and no single-use plastic",
+      "Close to trails, a scenic railway, and nearby parks"
+    ],
+    "corporateHighlights": [
+      "A full-property buyout gives a leadership team total privacy, one group at a time",
+      "Dedicated meeting space for presentations, strategy sessions, and roundtables",
+      "High-speed Wi-Fi throughout",
+      "Breakfast prepared fresh each morning, with dietary needs accommodated",
+      "Coordinated add-ons: private catered dinners, guided hikes, and town outings"
+    ]
+  },
+  "targetRegions": [
+    { "metro": "Northgate", "label": "the North Valley", "airport": "NGA" },
+    { "metro": "Baytown", "label": "the Coast", "airport": "BAY" },
+    { "metro": "Southport", "label": "the Southlands", "airport": "SPT" },
+    { "metro": "Junction City", "label": "the High Desert", "airport": "JCT" }
+  ],
+  "segments": ["Wedding", "Corporate"]
+}

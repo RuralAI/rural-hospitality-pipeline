@@ -1,0 +1,18 @@
+# Dependencies (this repo is zero-dependency; node_modules only appears if you add tooling)
+node_modules/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Skill service-key files (serper.key, hunter.key, etc.) — never commit
+*.key
+
+# OS
+.DS_Store
+
+# Packaged skills: the .skill installables ARE tracked (users download them);
+# ignore everything else that lands in dist/.
+dist/*
+!dist/*.skill
