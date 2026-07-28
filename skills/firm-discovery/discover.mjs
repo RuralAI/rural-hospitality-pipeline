@@ -31,17 +31,9 @@ import { readFileSync, existsSync } from "node:fs";
 // Shared, canonical helpers live in normalize.mjs (AUTO-GENERATED from
 // src/lib/normalize.js). Skill-specific shaping/dedup helpers live in lib.mjs.
 import { normalizeFirmName, stateNameToCode, expandStateCode } from "./normalize.mjs";
-import { mapToFirm, loadExistingNames, extractSearchMarket } from "./lib.mjs";
+import { mapToFirm, loadExistingNames, extractSearchMarket, resolveSearchTerms } from "./lib.mjs";
 
 // ---- config ---------------------------------------------------------------
-
-const SEGMENT_TERMS = {
-  // Wedding is a single term in config/client.js; Corporate is multi-term there.
-  // This spike is Wedding-primary; Corporate here is single-term and known-thin
-  // coverage. Fine for a Wedding-only deployment; revisit if Corporate is needed.
-  Wedding: "wedding planner",
-  Corporate: "corporate event planner",
-};
 
 const PAGE_SIZE = 20; // Serper Maps returns ~20 results/page
 const NOMINATIM_UA = "CRAI-firm-discovery/1.0 (ruralai.org)";
@@ -61,9 +53,11 @@ const getFlag = (name, dflt) => {
 const segment = getFlag("segment", "Wedding");
 const maxPages = parseInt(getFlag("max-pages", "3"), 10);
 const existingFirmsPath = getFlag("existing-firms", null);
-const term = SEGMENT_TERMS[segment];
-if (!term) {
-  console.error(`Unknown segment "${segment}". Known: ${Object.keys(SEGMENT_TERMS).join(", ")}`);
+let terms;
+try {
+  terms = resolveSearchTerms(segment);
+} catch (err) {
+  console.error(err.message);
   process.exit(1);
 }
 
@@ -145,7 +139,6 @@ async function serperMaps(q, ll, page) {
 
 // ---- run --------------------------------------------------------------------
 
-const query = `${term} ${geography}`;
 console.error(`Geocoding "${geography}" ...`);
 const loc = await geocode(geography);
 console.error(`Resolved ll=${loc.ll} (state: ${loc.state ?? "unknown"}${loc.stateCode ? `, ${loc.stateCode}` : ""})`);
@@ -158,33 +151,44 @@ if (existingNormalized.size > 0) {
 const seen = new Set(existingNormalized);
 const matchedExistingKeys = new Set();
 const firms = [];
-const pageLog = [];
+const pageLog = []; // each entry now carries a `term` field
 let outsideRegionCount = 0;
 
-for (let page = 1; page <= maxPages; page++) {
-  console.error(`Serper page ${page} ...`);
-  const places = await serperMaps(query, loc.ll, page);
-  let newUnique = 0;
-  for (const p of places) {
-    const key = normalizeFirmName(p.title);
-    if (!key) continue;
-    if (seen.has(key)) {
-      if (existingNormalized.has(key)) matchedExistingKeys.add(key);
-      continue;
+for (const term of terms) {
+  const query = `${term} ${geography}`;
+  for (let page = 1; page <= maxPages; page++) {
+    console.error(`Serper page ${page} for "${term}" ...`);
+    const places = await serperMaps(query, loc.ll, page);
+    let newUnique = 0;
+    for (const p of places) {
+      const key = normalizeFirmName(p.title);
+      if (!key) continue;
+      if (seen.has(key)) {
+        if (existingNormalized.has(key)) matchedExistingKeys.add(key);
+        continue;
+      }
+      seen.add(key);
+      const firm = mapToFirm(p, segment, extractSearchMarket(geography), loc.stateCode);
+      if (firm.outsideRegion) outsideRegionCount++;
+      firms.push(firm);
+      newUnique++;
     }
-    seen.add(key);
-    const firm = mapToFirm(p, segment, extractSearchMarket(geography), loc.stateCode);
-    if (firm.outsideRegion) outsideRegionCount++;
-    firms.push(firm);
-    newUnique++;
+    pageLog.push({ term, page, returned: places.length, newUnique });
+    if (places.length < PAGE_SIZE || newUnique === 0) break; // natural ceiling reached for this term
   }
-  pageLog.push({ page, returned: places.length, newUnique });
-  if (places.length < PAGE_SIZE || newUnique === 0) break; // natural ceiling reached
 }
 
+const termSummary = terms
+  .map((t) => {
+    const rows = pageLog.filter((l) => l.term === t);
+    const pages = rows.length;
+    const newCount = rows.reduce((sum, r) => sum + r.newUnique, 0);
+    return `"${t}" (${pages}p, ${newCount}new)`;
+  })
+  .join(" · ");
+
 console.error(
-  `Done. ${firms.length} new unique firm(s) across ${pageLog.length} page(s): ` +
-    pageLog.map((l) => `p${l.page}:${l.newUnique}new/${l.returned}`).join(" ") +
+  `Done. ${firms.length} new unique firm(s) across ${terms.length} term(s): ${termSummary}` +
     (matchedExistingKeys.size > 0 ? ` | skipped ${matchedExistingKeys.size} already in Airtable` : "") +
     (outsideRegionCount > 0 ? ` | ${outsideRegionCount} flagged outsideRegion` : "")
 );

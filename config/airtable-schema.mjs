@@ -18,7 +18,7 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
   const segmentChoices = { choices: segments.map((s) => ({ name: s })) };
   const check = { icon: "check", color: "greenBright" };
   const contactSourceChoices = {
-    choices: [{ name: "Scraped" }, { name: "Hunter" }, { name: "Manual" }],
+    choices: [{ name: "Scraped" }, { name: "Hunter" }, { name: "Manual" }, { name: "Apollo" }],
   };
 
   const firms = {

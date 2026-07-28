@@ -29,12 +29,17 @@ client, so the gotchas below are real ones we hit, not hypotheticals.
 4. **API keys:**
    - **Serper** (required, for discovery) from serper.dev
    - **Hunter** (optional, for the contact-enrichment pass) from hunter.io
+   - **Apollo** (required if you're running the **Corporate** segment, for
+     `corporate-research`'s Apollo-backed Track A candidate search) from
+     apollo.io — free tier is 75 credits/month, similar low volume to
+     Hunter's; a paid plan is needed for real enrichment spend
 5. **The 6 run-flow skill files** from `dist/`: `client-onboarding`,
    `voice-intake`, `firm-discovery`, `firm-review`, `contact-extraction`,
    `email-generation`. These are the pipeline, run in order.
    (`corporate-research` is **optional** — a Desktop research skill for clients
    running the Corporate segment. Upload it only if you plan to research the
-   corporate planner landscape; it is not part of the core run flow.)
+   corporate planner landscape; it is not part of the core run flow, but it
+   does need the Apollo key above.)
 
 > **Email note:** the pipeline currently drafts through **Gmail only** — but a
 > non-Gmail business can still run this pipeline through discovery, review, and
@@ -88,25 +93,27 @@ upload. Each installs once and is then available in any conversation.
 ## Step 3 — Get and store your API keys
 
 1. Create a **Serper** key at serper.dev (required). Optionally a **Hunter** key
-   at hunter.io (only needed for the enrichment pass).
+   at hunter.io (only needed for the enrichment pass), and an **Apollo** key at
+   apollo.io if you're running the Corporate segment.
 2. Give the key to the skill one of two equally-supported ways:
    - **Config table:** after onboarding builds the tables (Step 4), add one row,
      `label` = `Keys`, and paste each key into `serper-api-key` /
-     `hunter-api-key`. Discovery and extraction can then pull the key via the
-     connector — no per-run step. This is the tidiest option **when Desktop is
-     cooperating**, but the tool call that reads that row has been unreliable in
-     testing (a Claude-side tool-loading issue, not Airtable), so treat the next
-     option as an equal, not a fallback.
+     `hunter-api-key` / `apollo-api-key`. Discovery and extraction can then pull
+     the key via the connector — no per-run step. This is the tidiest option
+     **when Desktop is cooperating**, but the tool call that reads that row has
+     been unreliable in testing (a Claude-side tool-loading issue, not
+     Airtable), so treat the next option as an equal, not a fallback.
    - **Paste or upload per run:** paste the key into the chat when the skill asks,
-     or upload a one-line file named `serper.key` (and/or `hunter.key`) into the
-     working directory. The skill reads either automatically. This does not depend
-     on the connector, so it's the reliable choice when Config reads are flaky.
+     or upload a one-line file named `serper.key` (and/or `hunter.key`,
+     `apollo.key`) into the working directory. The skill reads either
+     automatically. This does not depend on the connector, so it's the reliable
+     choice when Config reads are flaky.
 
    Either way the key lands in the same place at runtime; pick whichever is
    working for you that session.
 
 **Key safety (low-stakes keys only):**
-- Only **Serper** and **Hunter** (and free-plan Apollo) may live in Airtable.
+- Only **Serper**, **Hunter**, and **Apollo** (free-plan) may live in Airtable.
   **Never** store passwords, OAuth tokens, mail/IMAP credentials, or payment
   methods.
 - Keep the base **private**. **Do not screenshot or export the Config table.**

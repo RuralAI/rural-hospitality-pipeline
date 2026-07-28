@@ -1,5 +1,6 @@
 [
   { "from": "src/lib/normalize.js",              "to": "skills/firm-discovery/normalize.mjs" },
+  { "from": "src/lib/normalize.js",              "to": "skills/corporate-research/normalize.mjs" },
   { "from": "src/pipeline/stage-02-extraction.js", "to": "skills/contact-extraction/stage-02-extraction.mjs" },
   { "from": "src/pipeline/stage-02-hunter.js",     "to": "skills/contact-extraction/stage-02-hunter.js" },
   { "from": "src/pipeline/stage-02-merge.js",      "to": "skills/contact-extraction/merge.mjs" },

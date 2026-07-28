@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `firm-discovery`: Corporate segment discovery now runs three search terms per
+  city (`corporate event planner`, `corporate retreat planner`, `destination
+  management company`) instead of one, merged and deduped by normalized firm
+  name. Wedding is unchanged. Corporate now spends ~3× the Serper credits per
+  city — noted in `SKILL.md`.
+- `corporate-research` gains `apollo-search.mjs`: a real discovery script for
+  the corporate segment's in-house decision-makers (Head of People, Executive
+  Assistant, Office Manager, etc.). Calls Apollo's People Search API (free,
+  zero credits) with title/location/employee-range filters, with an optional
+  `--reveal N` (Apollo's People Match, credit-consuming, opt-in, cost always
+  reported) to get a real name/email for up to N candidates. Results write
+  directly to `Firms`/`Contacts` — a deliberate, documented exception to
+  `firm-review`'s usual sole-writer role, since an ordinary employer doesn't
+  fit its planner/venue/vendor categorization. `Contacts.contact-source`
+  schema gains an `"Apollo"` choice. Live-tested with a real Apollo key: search
+  and reveal both confirmed working, though Apollo's Search/Match responses
+  only ever return organization *booleans* (`has_city`, `has_phone`, etc.),
+  never real values — so Apollo-sourced Firms rows will have blank
+  `city-metro`/`website-url` (a real Apollo API limitation, documented in
+  `SKILL.md`, not a bug).
+
 ### Removed
 - `docs/new-user-airtable-setup-guide.md` — a pre-skills guide that walked operators
   through `npm install` / `.env.local` / `npm run setup:airtable` to build the base by

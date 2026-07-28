@@ -11,6 +11,31 @@
 import { readFileSync, existsSync } from "node:fs";
 import { normalizeFirmName, extractCity, extractZip, extractState, stateCodeToName } from "./normalize.mjs";
 
+// ---- segment → search terms ------------------------------------------------
+
+const SEGMENT_TERMS = {
+  Wedding: ["wedding planner"],
+  Corporate: [
+    "corporate event planner",
+    "corporate retreat planner",
+    "destination management company",
+  ],
+};
+
+/**
+ * Resolve a segment to the list of Serper search terms it runs per city.
+ * Wedding is a single term; Corporate runs three (a thin market that surfaces
+ * under several phrasings) — discover.mjs merges and dedupes results across
+ * all terms for a segment by normalized firm name.
+ */
+export function resolveSearchTerms(segment) {
+  const terms = SEGMENT_TERMS[segment];
+  if (!terms) {
+    throw new Error(`Unknown segment: "${segment}". Must be one of: ${Object.keys(SEGMENT_TERMS).join(", ")}`);
+  }
+  return terms;
+}
+
 // ---- firm record shaping -----------------------------------------------------
 
 /**

@@ -10,7 +10,7 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { writeFileSync, unlinkSync, existsSync } from "node:fs";
-import { mapToFirm, loadExistingNames, extractSearchMarket } from "./lib.mjs";
+import { mapToFirm, loadExistingNames, extractSearchMarket, resolveSearchTerms } from "./lib.mjs";
 import { normalizeFirmName } from "./normalize.mjs";
 
 describe("extractSearchMarket — city/market from a 'City ST' geography string", () => {
@@ -44,6 +44,24 @@ describe("extractSearchMarket — city/market from a 'City ST' geography string"
   test("non-string input returns empty string", () => {
     assert.equal(extractSearchMarket(null), "");
     assert.equal(extractSearchMarket(undefined), "");
+  });
+});
+
+describe("resolveSearchTerms — segment → search term list", () => {
+  test("Wedding resolves to its single term", () => {
+    assert.deepEqual(resolveSearchTerms("Wedding"), ["wedding planner"]);
+  });
+
+  test("Corporate resolves to three terms", () => {
+    assert.deepEqual(resolveSearchTerms("Corporate"), [
+      "corporate event planner",
+      "corporate retreat planner",
+      "destination management company",
+    ]);
+  });
+
+  test("unknown segment throws", () => {
+    assert.throws(() => resolveSearchTerms("Vendor"), /Unknown segment/);
   });
 });
 

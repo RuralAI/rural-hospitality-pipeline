@@ -26,12 +26,12 @@ Setup (run once per business):
 
 Pipeline (run in order per city/segment):
 - `firm-discovery` — Serper Maps search + geocode. Returns firm records; writes nothing.
-- `firm-review` — categorizes and triages firms; sole writer to the `Firms` table (Keepers only).
+- `firm-review` — categorizes and triages firms; sole writer to the `Firms` table (Keepers only) for Serper/Google-Maps-sourced records. Exception: `corporate-research`'s optional Apollo step writes Apollo-sourced Corporate records directly (an ordinary employer doesn't fit the planner/venue/vendor categorization), gated by its own human-approval step instead.
 - `contact-extraction` — scrapes contact addresses (free), with an optional Hunter enrichment pass. Writes `Contacts`.
 - `email-generation` — renders the approved template and creates one Gmail draft per contact.
 
 Optional:
-- `corporate-research` — guided research for the corporate-retreat segment; writes decision-maker profiles to the `Corporate Research` table (provisioned only when the client runs the Corporate segment).
+- `corporate-research` — guided research for the corporate-retreat segment; writes decision-maker profiles to the `Corporate Research` table (provisioned only when the client runs the Corporate segment). Also bundles `apollo-search.mjs`, an optional real discovery step (needs an Apollo key) that searches Apollo's People Search API for in-house decision-makers and writes them directly to `Firms`/`Contacts`.
 
 Each skill lives in `skills/<name>/SKILL.md`. Packaged installables are in `dist/`.
 

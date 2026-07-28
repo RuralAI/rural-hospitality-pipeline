@@ -98,3 +98,10 @@ test("toCreateTablePayload throws when a link target is unresolved", () => {
   const contacts = buildTableDefinitions(SEGMENTS).find((t) => t.name === "Contacts");
   assert.throws(() => toCreateTablePayload(contacts, {}), /Firms/);
 });
+
+test("Contacts.contact-source includes Apollo as a valid choice", () => {
+  const contacts = buildTableDefinitions(SEGMENTS).find((t) => t.name === "Contacts");
+  const contactSource = contacts.fields.find((f) => f.name === "contact-source");
+  const names = contactSource.options.choices.map((c) => c.name);
+  assert.deepEqual(names, ["Scraped", "Hunter", "Manual", "Apollo"]);
+});

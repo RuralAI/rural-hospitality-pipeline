@@ -20,8 +20,9 @@ Everything you need in hand before running the pipeline in Claude Desktop. Work 
 - [ ] An **Airtable account you control.** *(You do not build any tables by hand — `client-onboarding` provisions them. You just need the account and the workspace access from step 2.)*
 - [ ] A **Serper API key** (required, for discovery) from serper.dev.
 - [ ] *(Optional)* A **Hunter API key** (for the contact-enrichment pass) from hunter.io. The free tier is 25 searches/month; a paid plan is needed for real volume.
+- [ ] *(Required for the Corporate segment)* An **Apollo API key** (for `corporate-research`'s Apollo-backed Track A candidate search) from apollo.io. The free tier is 75 credits/month — similar low volume to Hunter's; a paid plan is needed for real enrichment spend.
 
-> **Where keys go (two equally-supported ways):** (a) the Airtable **Config** table — one row, `label` = `Keys`, paste into `serper-api-key` / `hunter-api-key` (after Step 4 builds the tables), which the skills pull via the connector; or (b) **paste the key in chat / upload a `serper.key` (and `hunter.key`) file** into the working directory when a skill asks. Config is tidiest when the connector cooperates, but its read has been flaky in testing — the paste/upload path doesn't touch the connector, so keep it as an equal option, not a fallback.
+> **Where keys go (two equally-supported ways):** (a) the Airtable **Config** table — one row, `label` = `Keys`, paste into `serper-api-key` / `hunter-api-key` / `apollo-api-key` (after Step 4 builds the tables), which the skills pull via the connector; or (b) **paste the key in chat / upload a `serper.key` (and `hunter.key`, `apollo.key`) file** into the working directory when a skill asks. Config is tidiest when the connector cooperates, but its read has been flaky in testing — the paste/upload path doesn't touch the connector, so keep it as an equal option, not a fallback.
 >
 > **Key safety:** only low-stakes service keys (Serper, Hunter, free-plan Apollo) may live in Airtable. No passwords, OAuth tokens, or mail credentials. Rotate any key that was ever shared, exported, or screenshotted.
 
@@ -36,7 +37,7 @@ Upload these `.skill` files from `dist/` into the project. They run in this orde
 - [ ] `contact-extraction.skill`
 - [ ] `email-generation.skill`
 
-*(`corporate-research.skill` is a research aid, not part of the run loop — skip it for a standard run.)*
+*(`corporate-research.skill` is a research aid, not part of the run loop — skip it for a standard run. If you do run it for a Corporate-segment client, you'll need the Apollo key from section 3.)*
 
 ## 5. Intake information to have ready
 

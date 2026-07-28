@@ -9,7 +9,7 @@ description: >
   should we be targeting?", "how do companies plan retreats?", or "is this
   in-house or outsourced?". Also trigger when the user is preparing to build
   the corporate planner discovery pipeline.
-compatibility: Airtable connector required (reads Business Profile and Region Naming, writes Corporate Research).
+compatibility: Requires code execution with network egress enabled (for apollo-search.mjs). Apollo API key required for the discovery step. Airtable connector required (reads Business Profile and Region Naming, writes Corporate Research, Firms, and Contacts).
 ---
 
 # Corporate Research Skill
@@ -128,6 +128,50 @@ as the `sourcing-path` for each profile:
 - **Agency directories** — ILEA, PCMA (Professional Convention Management Association), SPIN (Special Events Network)
 - **Google Maps** — "corporate event planning [city]", "retreat planning [city]"
 - **Industry associations** — local chamber of commerce, HR association chapters
+
+### Step 5 — Run Apollo search for real candidates (optional, needs an Apollo key)
+
+Once a decision-maker profile's titles and company-size band are defined
+(Step 3), `apollo-search.mjs` (bundled with this skill) can search Apollo's
+People Search API for real candidates matching that profile — free, zero
+Apollo credits.
+
+1. Before running, fetch existing `firm-name` values from Airtable Firms via
+   the connector and write them to a plain JSON array file (e.g.
+   `existing-firms.json`), same cross-run dedup pattern `firm-discovery` uses.
+   Skip this on a first run with an empty Firms table.
+2. Run: `node apollo-search.mjs --titles "<profile's titles, comma-separated>"
+   --location "<anchor-city from Region Naming>" --employee-range
+   "<profile's company-size band>" --existing-firms existing-firms.json`
+3. Present the returned candidates to the operator in chat — names are
+   masked (Apollo obfuscates the last name and doesn't return a real email on
+   a plain search). **Known limitation (confirmed live, 2026-07-27):** the
+   written Firms row's `city-metro` and `website-url` will be blank for
+   Apollo-sourced firms — Apollo's People Search and People Match responses
+   only return organization *booleans* (`has_city`, `has_phone`, etc.), never
+   the actual values. Getting real org details would need Apollo's separate
+   Organization Enrichment endpoint, which is out of scope here. The
+   candidate's name/title/email is unaffected.
+4. **Optional reveal:** if the operator wants real contact info for a few
+   candidates, re-run with `--reveal N` (e.g. `--reveal 5`) — this spends
+   Apollo credits (reported in the run's summary line) to get a real
+   email/name for up to N candidates. Only do this with the operator's
+   explicit go-ahead, since it spends their Apollo credit balance.
+5. **Operator approves which candidates to keep.** This step is the human
+   quality gate for Apollo-sourced records — they do **not** pass through
+   `firm-review`'s Planner/Venue/Vendor/Unclear triage (an ordinary employer
+   doesn't fit that scheme); Apollo's own title/company-size filtering plus
+   this approval step are the gate instead.
+6. Write approved candidates to Airtable: **Firms** first (dedup against
+   existing by normalized name, `source: "Apollo"`, `segment: "Corporate"`),
+   then **Contacts** once each Firms row has a record id (`contact-source:
+   "Apollo"`, linked via `firm-id`). Writes require ids, not names — use the
+   Firms/Contacts table ids (`tbl...`) and field ids (`fld...`), same
+   convention as every other skill's Airtable write.
+
+If the base has no Corporate Research table (client wasn't onboarded with
+the Corporate segment), the operator needs to re-run `client-onboarding`
+first — same check as the Output section below.
 
 ---
 

@@ -37,11 +37,11 @@ packaged skill, but if you ever copy files by hand, copy all four.
 - Serper Maps and Nominatim endpoint/header/response-field assumptions confirmed against first-party sources (serper.dev's own playground; Nominatim's official docs) and a live call.
 - `normalizeFirmName()` no longer strips business-suffix words (LLC, Events, Co, ...) from anywhere in the name — only from the trailing position, repeatedly. The old version could collide two distinct firms if a suffix-like word sat mid-name (e.g. would have mangled "Aspen Wedding Photography"). Caught by `lib.test.mjs`, not by inspection.
 - Full unit test coverage of all pure helpers (34 tests, `lib.test.mjs`) — was zero.
+- **2026-07-27:** Corporate segment now runs three search terms per city (`corporate event planner`, `corporate retreat planner`, `destination management company`), merged and deduped by normalized firm name — was single-term with known-thin coverage. Wedding unchanged.
 
 **Still open — read before trusting this unsupervised:**
 - `normalizeFirmName()`'s exact suffix-word list and overall algorithm is still an approximation of `src/lib/normalize.js`, not a diff against that real file. If a firm name normalizes differently here than in the real app, cross-run dedup could still miss a match or (less likely, now that stripping is trailing-only) false-match.
 - **The connector loop itself has not been run end to end in a live claude.ai session.** Everything tested so far is the script in isolation against a hand-built `existing-firms.json`. The actual loop — Claude fetching existing names via the Airtable connector, writing the file, calling this script, writing results back — has zero live test coverage. This is the top remaining gap before unsupervised use.
-- Corporate segment is single-term (`"corporate event planner"`); the real app merges 3 terms. Fine for a Wedding-only deployment; revisit if Corporate discovery is needed soon.
 - `gl: "us"` is hardcoded rather than derived from the resolved location. Deliberate, acceptable simplification for this single US-based client (Example Inn); would need fixing for the reusable-template goal.
 
 ## Before running
@@ -75,6 +75,12 @@ node discover.mjs "Denver CO" --segment Wedding --max-pages 3 --existing-firms e
 If it's the very first run for this Airtable base (nothing in Firms yet), skip the connector fetch and omit `--existing-firms` — the script degrades cleanly to within-run-only dedup.
 
 Expected: geocode succeeds, 3 pages fetched (GPS coords sent on every page), duplicates removed across pages, ~60 well-formed firm records printed as JSON, and a summary line reporting how many were skipped as already-in-Airtable and how many were flagged `outsideRegion`.
+
+**Corporate costs ~3× the Serper credits per city.** It runs three search terms
+instead of Wedding's one, so at the default `--max-pages 3` that's up to 9
+Serper calls per city instead of 3. Results are merged and deduped by
+normalized firm name across all three terms automatically — no extra step
+needed, just extra credit spend to budget for before a large Corporate run.
 
 Report to the user: did it finish in one session, actual new-record count, how many were skipped as duplicates, how many flagged outsideRegion, and whether any output was truncated.
 
