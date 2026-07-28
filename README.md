@@ -35,7 +35,7 @@ One optional skill:
 3. Install the skills: in Claude, go to **Settings → Skills → Add Skill** and upload the `.skill` files from **[`dist/`](dist/)**.
 4. Run `client-onboarding`, then `voice-intake`, then the four pipeline skills in order.
 
-There is also a visual walkthrough at **[docs/pilot-walkthrough.html](docs/pilot-walkthrough.html)**.
+There is also a visual walkthrough, published at **https://ruralai.github.io/rural-hospitality-pipeline/** (source: [`docs/index.html`](docs/index.html)).
 
 ### Reference docs
 

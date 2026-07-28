@@ -30,6 +30,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `src`/`config` against `skills/`, never `skills/` against `dist/`.
 
 ### Changed
+- Renamed `docs/pilot-walkthrough.html` to `docs/index.html`. GitHub Pages already
+  publishes this repo from `main` + `/docs`, so the walkthrough is now the site
+  landing page at https://ruralai.github.io/rural-hospitality-pipeline/ instead of
+  leaving the site root on a 404. `README.md` points at the published URL.
 - Test fixtures now use fictional businesses throughout. Some fixture contact data
   had been carried over from a live acceptance run, which meant real firms' contact
   addresses (and one real person's name) sat in the test suite and inside one
