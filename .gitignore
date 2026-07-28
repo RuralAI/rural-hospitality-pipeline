@@ -16,3 +16,7 @@ node_modules/
 # ignore everything else that lands in dist/.
 dist/*
 !dist/*.skill
+
+# Session handoff notes — internal working notes, never published. Written each
+# session per the maintainer's own workflow; kept local, out of the repo.
+handoffs/
