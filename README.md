@@ -86,4 +86,4 @@ a maintainer escape hatch for a full field-level reconcile — **operators never
 
 ## License
 
-Released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) by the Center for Rural AI. See [LICENSE](LICENSE).
+Released under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) by the Center for Rural AI. See [LICENSE](LICENSE) and [NOTICE](NOTICE).

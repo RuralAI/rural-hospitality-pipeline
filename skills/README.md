@@ -97,4 +97,4 @@ When deploying this pipeline for a new client:
 3. Run the **corporate-research** skill if the corporate segment is in scope — it writes decision-maker profiles to the Airtable Corporate Research table
 4. The **firm-review** action skill (in `skills/firm-review/`) works as-is across deployments — the evaluation criteria are segment-based, not client-specific
 
-_All skills are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) as part of the Center for Rural AI Rural Hospitality Pilot._
+_All skills are released under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) as part of the Center for Rural AI Rural Hospitality Pilot._

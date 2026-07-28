@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- Relicensed from CC BY 4.0 to the Apache License, Version 2.0, matching the
+  license used on the Center for Rural AI's other public repos. `LICENSE` now
+  holds the full Apache 2.0 text; a new `NOTICE` file carries the project name
+  and copyright line. Updated `package.json`'s `license` field and the license
+  mentions in `README.md`/`skills/README.md` to match.
+
 ### Added
 - `firm-discovery`: Corporate segment discovery now runs three search terms per
   city (`corporate event planner`, `corporate retreat planner`, `destination
