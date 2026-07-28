@@ -7,7 +7,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- `dist/client-onboarding.skill` was stale: the Apollo work added an `"Apollo"`
+  choice to `Contacts.contact-source` in `config/airtable-schema.mjs` and synced it
+  into `skills/client-onboarding/table-schema.mjs`, but the installable was never
+  repackaged. Anyone installing the shipped `.skill` provisioned a base without
+  that choice, so `apollo-search.mjs` writes to the field would have failed.
+  Repackaged. Note the drift check cannot catch this class of bug: it compares
+  `src`/`config` against `skills/`, never `skills/` against `dist/`.
+
 ### Changed
+- Test fixtures now use fictional businesses throughout. Some fixture contact data
+  had been carried over from a live acceptance run, which meant real firms' contact
+  addresses (and one real person's name) sat in the test suite and inside one
+  packaged `.skill`. Replaced with fictional firms on RFC 2606 `.example` domains.
+  Behaviour is unchanged; two internal test titles and one comment that referred to
+  a discovered firm by name were renamed to describe the rule instead.
 - Relicensed from CC BY 4.0 to the Apache License, Version 2.0, matching the
   license used on the Center for Rural AI's other public repos. `LICENSE` now
   holds the full Apache 2.0 text; a new `NOTICE` file carries the project name
