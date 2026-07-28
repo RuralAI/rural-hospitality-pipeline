@@ -7,6 +7,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `skills/dist-drift.test.mjs` — a drift check for the second hop, `skills/` →
+  `dist/`. For every skill it compares the packaged `.skill` archive's file list
+  and each file's bytes against `skills/<name>/`, and fails telling you to run
+  `npm run package:skills`. It also catches a skill with no archive and an archive
+  with no skill folder. Reads archives with `unzip`, which `package-skill.sh`
+  already requires, so no new dependency.
+
+  Only hop 1 (`src`/`config` → `skills/`) had been guarded, which is how a stale
+  installable shipped while the suite stayed green (see Fixed). Because the check
+  compares `dist/` against `skills/`, **package before you test** — the
+  maintainer checklist in `CLAUDE.md` has been reordered accordingly.
+
 ### Fixed
 - `dist/client-onboarding.skill` was stale: the Apollo work added an `"Apollo"`
   choice to `Contacts.contact-source` in `config/airtable-schema.mjs` and synced it

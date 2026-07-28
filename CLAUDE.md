@@ -39,14 +39,25 @@ Each skill lives in `skills/<name>/SKILL.md`. Packaged installables are in `dist
 
 `src/` and `config/` are canonical. Some skill scripts are generated **verbatim**
 from them per `skills/sync-manifest.json`, so a fix belongs in the source, never
-hand-edited into a bundled skill file. `npm test` includes a drift check that
-fails if a bundled copy diverges.
+hand-edited into a bundled skill file.
+
+Code travels **two hops**, and `npm test` guards both — a change has not shipped
+until it has made it through both:
+
+```
+src/ + config/  --sync-->  skills/<name>/  --package-->  dist/<name>.skill
+```
+
+- Hop 1 (`skills/sync.test.mjs`): bundled copies must match their canonical source.
+- Hop 2 (`skills/dist-drift.test.mjs`): each `dist/*.skill` must match its
+  `skills/<name>/` folder, file list and bytes. `dist/` is what people install, so
+  editing a skill without repackaging ships stale logic to every new installation.
 
 ```bash
-npm run sync:skills        # regenerate bundled copies
-npm run sync:skills:check  # fail on drift
-npm run package:skills     # rebuild dist/*.skill
-npm test                   # unit tests + drift check (Node built-in runner; no deps)
+npm run sync:skills        # regenerate bundled copies (hop 1)
+npm run sync:skills:check  # fail on drift (hop 1)
+npm run package:skills     # rebuild dist/*.skill (hop 2)
+npm test                   # unit tests + both drift checks (Node built-in runner; no deps)
 ```
 
 `config/airtable-schema.mjs` is the single source for the Airtable table/field
@@ -68,6 +79,11 @@ via sync, by `client-onboarding`'s connector-based provisioning.
 
 1. Edit the `SKILL.md` (and, for bundled logic, the canonical source in `src/`/`config/`).
 2. `npm run sync:skills` if you touched a synced source.
-3. `npm test` — must pass, including the drift check.
-4. `npm run package:skills` to rebuild the `dist/` installable.
+3. `npm run package:skills` to rebuild the `dist/` installable.
+4. `npm test` — must pass, including both drift checks.
 5. Update `README.md`, `skills/README.md`, and `CHANGELOG.md` as needed.
+
+Package **before** you test. The hop-2 drift check compares `dist/` against
+`skills/`, so testing first reports a stale-archive failure that repackaging is
+what actually fixes. Commit the rebuilt `.skill` alongside the source change —
+they are one logical change.

@@ -69,8 +69,16 @@ Some skill scripts are generated **verbatim** from canonical sources in `src/` a
 npm run sync:skills        # regenerate bundled copies from src/ + config/
 npm run sync:skills:check  # fail if any bundled copy has drifted
 npm run package:skills     # rebuild every dist/*.skill
-npm test                   # unit tests + the drift check
+npm test                   # unit tests + both drift checks
 ```
+
+Code reaches an installed skill in two hops, and `npm test` guards both:
+
+```
+src/ + config/  --sync-->  skills/<name>/  --package-->  dist/<name>.skill
+```
+
+So after changing a skill, run `npm run package:skills` **before** `npm test` — the second check compares each `dist/*.skill` against its `skills/` folder, and `dist/` is the copy people install.
 
 `npm test` runs on Node's built-in test runner — this repo has **no runtime dependencies**. See [docs/skills-bundled-copy-drift.md](docs/skills-bundled-copy-drift.md) for details.
 
