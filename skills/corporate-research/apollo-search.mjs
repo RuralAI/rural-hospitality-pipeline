@@ -19,14 +19,22 @@
 // Airtable (fetch these via the Airtable connector before running this
 // script) -- same cross-run dedup pattern as discover.mjs.
 //
-// IMPORTANT (honesty flag, 2026-07-27): the People Search endpoint, auth
-// header, and parameter names below (person_titles[], organization_locations[],
-// organization_num_employees_ranges[], page, per_page) were confirmed against
-// Apollo's own published docs (docs.apollo.io) during design -- not assumed.
-// The exact STRING FORMAT organization_num_employees_ranges[] expects was
-// NOT confirmed against a live call: --employee-range is passed through
-// unvalidated, so supply it in whatever format Apollo's docs specify at
-// runtime. See docs/superpowers/specs/2026-07-27-apollo-track-a-integration-design.md.
+// The People Search endpoint, auth header, and parameter names below
+// (person_titles[], organization_locations[], organization_num_employees_ranges[],
+// page, per_page) were confirmed against Apollo's own published docs
+// (docs.apollo.io) during design -- not assumed.
+//
+// CONFIRMED LIVE 2026-08-12: a first call with --employee-range "20,200" was
+// accepted and returned 25 candidates, so the "MIN,MAX" string this script passes
+// through is the format organization_num_employees_ranges[] expects. The earlier
+// honesty flag warning that the format was unverified is resolved.
+//
+// Also observed on that run, and NOT a bug in this script: Apollo's title matching
+// returned only People/HR leadership and Chief of Staff out of six titles queried.
+// Executive Assistant, Office Manager, and Operations Lead came back empty. Whether
+// that is Apollo's matching, its coverage of admin roles, or real scarcity at this
+// company size is unresolved -- see the Known limitations note in SKILL.md.
+// See docs/superpowers/specs/2026-07-27-apollo-track-a-integration-design.md.
 
 import { readFileSync, existsSync } from "node:fs";
 import { normalizeFirmName } from "./normalize.mjs";

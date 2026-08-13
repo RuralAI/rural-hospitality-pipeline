@@ -14,6 +14,8 @@ compatibility: Requires code execution with network egress enabled (for apollo-s
 
 # Corporate Research Skill
 
+**Version:** 1.0.0 · Center for Rural AI
+
 The corporate segment has a structural unknown that must be resolved before building
 a discovery pipeline: **who actually books corporate retreats?** This skill guides
 the research needed to answer that question, then writes the decision-maker profiles
@@ -78,6 +80,17 @@ Answer these before looking at any specific companies or planners:
      enterprise all-hands: leadership offsites, sales kickoffs, product retreats.
    - Translate capacity into a headcount band (e.g. a 16-21 guest property maps to
      companies of roughly 20-150 employees, or specific teams within larger ones).
+   - **A blank or vague `capacity` does not block this.** Company headcount is a
+     loose proxy for retreat size at the best of times: a 5,000-person company sends
+     a 20-person team to an offsite, and that team is exactly the target. So the
+     band is a search filter to tune from results, not a figure derived from the
+     property. When `capacity` gives you nothing usable, record the band as
+     **20-200 employees** and label it a starting filter to be narrowed once real
+     candidates come back. Say that is what you did. Do not stall the research or
+     the Apollo run waiting for a room count, and do not write a made-up capacity
+     into the property's record — those are different things: `capacity` is a fact
+     about the property and must never be invented, while the headcount band is a
+     targeting choice the operator can change at any time.
 
 2. **What industries are most likely to book a retreat here?**
    - Culture fit for the property and its `location` / `highlights` (e.g. an
@@ -136,6 +149,12 @@ Once a decision-maker profile's titles and company-size band are defined
 People Search API for real candidates matching that profile — free, zero
 Apollo credits.
 
+0. Resolve the Apollo key the same way every other skill resolves its key: read
+   `apollo-api-key` from the single-row Airtable Config table via the connector
+   first, and only if that cell is empty ask the operator to paste one (telling
+   them it belongs in base → Config table → `apollo-api-key`). Set it as
+   `APOLLO_API_KEY` when running the script. Do not echo the key back into the
+   conversation.
 1. Before running, fetch existing `firm-name` values from Airtable Firms via
    the connector and write them to a plain JSON array file (e.g.
    `existing-firms.json`), same cross-run dedup pattern `firm-discovery` uses.
@@ -143,6 +162,15 @@ Apollo credits.
 2. Run: `node apollo-search.mjs --titles "<profile's titles, comma-separated>"
    --location "<anchor-city from Region Naming>" --employee-range
    "<profile's company-size band>" --existing-firms existing-firms.json`
+
+   `--employee-range` is required by the script, but a profile whose
+   `company-size` was never determined is **not** a blocker: use `20,200` and tell
+   the operator that is a starting filter they can narrow. See Step 1, question 1.
+   The `"MIN,MAX"` format is confirmed working against a live call (2026-08-12), so
+   do not warn the operator that it might be rejected.
+   Apollo only applies to the in-house profile anyway — agency and DMC profiles are
+   companies, found via Maps and directories, so a run covers one profile, not all
+   of them. Say so rather than presenting it as a problem.
 3. Present the returned candidates to the operator in chat — names are
    masked (Apollo obfuscates the last name and doesn't return a real email on
    a plain search). **Known limitation (confirmed live, 2026-07-27):** the
@@ -152,6 +180,24 @@ Apollo credits.
    the actual values. Getting real org details would need Apollo's separate
    Organization Enrichment endpoint, which is out of scope here. The
    candidate's name/title/email is unaffected.
+
+   **Pre-screen before presenting.** Apollo's `organization_num_employees_ranges[]`
+   appears to match on a local office rather than the whole organization, so
+   results routinely include employers well outside the band, along with
+   government agencies and large nonprofits that are unlikely retreat bookers.
+   Flag those in the table rather than leaving the operator to spot them: mark any
+   candidate whose employer is a public agency, or visibly far larger than the
+   band, with a short "likely out of band" note and a suggested skip. Do not drop
+   them silently — the operator is the gate, so the call stays theirs.
+
+   **Known title-coverage gap (observed live, 2026-08-12):** a six-title query
+   returned only People/HR leadership and Chief of Staff. Executive Assistant,
+   Office Manager, and Operations Lead came back empty despite being in the query
+   and named in the research as common retreat owners. Cause is unresolved: Apollo's
+   title matching, its coverage of admin roles, or genuine scarcity at this company
+   size. Report the title distribution alongside the count so the gap stays
+   visible, and say plainly that if a profile's titles return nothing across runs,
+   that part of the profile needs a sourcing path other than Apollo.
 4. **Optional reveal:** if the operator wants real contact info for a few
    candidates, re-run with `--reveal N` (e.g. `--reveal 5`) — this spends
    Apollo credits (reported in the run's summary line) to get a real
@@ -163,11 +209,27 @@ Apollo credits.
    doesn't fit that scheme); Apollo's own title/company-size filtering plus
    this approval step are the gate instead.
 6. Write approved candidates to Airtable: **Firms** first (dedup against
-   existing by normalized name, `source: "Apollo"`, `segment: "Corporate"`),
+   existing by normalized name, `source: "Apollo"`, `segment: "Corporate"`,
+   **`audience: "In-house"`**),
    then **Contacts** once each Firms row has a record id (`contact-source:
    "Apollo"`, linked via `firm-id`). Writes require ids, not names — use the
    Firms/Contacts table ids (`tbl...`) and field ids (`fld...`), same
    convention as every other skill's Airtable write.
+
+   `audience: "In-house"` is what stops these contacts receiving the agency
+   template, whose lead-in praises the reader's event-planning business. An HR
+   director does not have one, so that copy reads as a mistake. With the field set,
+   `email-generation` picks the in-house variant instead, and refuses to send
+   rather than falling back if that variant has not been drafted yet.
+
+   **Always set `search-market` to the city you passed as `--location`.** Apollo
+   does not return the organization's city, so `city-metro` stays blank on these
+   rows (see the known limitation above) and `email-generation` has nothing to
+   resolve a region from. It falls back to the claim-free travel sentence, which
+   silently drops the verified flight or drive line — the most persuasive sentence
+   in the email — from every Apollo-sourced contact. You know the market: it is the
+   search input. Write it. `compose.mjs` resolves the region from `search-market`
+   first and only falls back to `city-metro`, so setting it restores the match.
 
 If the base has no Corporate Research table (client wasn't onboarded with
 the Corporate segment), the operator needs to re-run `client-onboarding`

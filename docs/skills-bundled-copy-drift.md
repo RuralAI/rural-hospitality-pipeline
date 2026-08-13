@@ -47,7 +47,7 @@ The goal above was stated as "a skill can never ship stale logic again." That wa
 half true, because the code travels **two** hops and only the first was checked:
 
 ```
-src/ + config/  --(1) sync-skills.mjs-->  skills/<name>/  --(2) package-skill.sh-->  dist/<name>.skill
+src/ + config/  --(1) sync-skills.mjs-->  skills/<name>/  --(2) package-skill.sh-->  install/<name>.skill
 ```
 
 Hop 1 is guarded by `npm run sync:skills:check` and `skills/sync.test.mjs`.
@@ -56,11 +56,11 @@ Hop 2 was unguarded until 2026-07-27, and it drifted for real: the Apollo work
 added an `"Apollo"` choice to `Contacts.contact-source` in
 `config/airtable-schema.mjs`, sync carried it into
 `skills/client-onboarding/table-schema.mjs`, and `npm test` went green — but
-`dist/client-onboarding.skill` was never rebuilt. **`dist/` is the copy people
+`install/client-onboarding.skill` was never rebuilt. **`install/` is the copy people
 actually install**, so the shipped skill provisioned bases missing a field value
 that `apollo-search.mjs` writes to, while every test in the repo passed.
 
-`skills/dist-drift.test.mjs` now guards hop 2: for each skill it compares the
+`skills/install-drift.test.mjs` now guards hop 2: for each skill it compares the
 archive's file list and every file's bytes against `skills/<name>/`, and fails
 with `Run: npm run package:skills`. It reads archives with `unzip`, which
 `package-skill.sh` already requires.

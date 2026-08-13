@@ -34,27 +34,85 @@ export function normalizeFirmName(name) {
   return n;
 }
 
+// Address parsing is anchored on the STATE segment, not on a zip.
+//
+// These once required the full ", CITY, ST 12345" shape, which a Google Maps
+// listing frequently does not have: plenty carry no zip, no street line (the
+// address begins with the city), or a spelled-out state. Any of those returned ""
+// and the record arrived in review missing `city-metro` for no good reason.
+//
+// Splitting on commas and finding the state segment handles all three, and is
+// easier to reason about than one regex trying to cover every shape.
+
+const COUNTRY_SEGMENTS = new Set(["united states", "united states of america", "usa", "us"]);
+
+// Built on first use: STATE_NAME_TO_CODE is declared further down the file, so
+// reading it at module-evaluation time here would hit the temporal dead zone.
+let stateCodes;
+function isStateCode(s) {
+  stateCodes ??= new Set(Object.values(STATE_NAME_TO_CODE));
+  return stateCodes.has(s);
+}
+
+const ZIP_SUFFIX_RE = /\s*\b(\d{5})(?:-\d{4})?$/;
+
+/**
+ * The 2-letter code when a segment is *only* a state, optionally followed by a
+ * zip: "CO", "CO 80202", "Colorado 80202". "" for anything else, so a street
+ * line that happens to contain a state-like word is never mistaken for one.
+ */
+function stateFromSegment(segment) {
+  const withoutZip = segment.replace(ZIP_SUFFIX_RE, "").trim();
+  if (isStateCode(withoutZip)) return withoutZip;
+  return stateNameToCode(withoutZip);
+}
+
+/**
+ * Locate the state segment, searching from the end so a city named after a state
+ * ("Kansas City, MO") cannot win over the real one. Returns the state code, the
+ * zip that rode along with it, and the segment before it (the city).
+ */
+function parseAddress(address) {
+  const parts = address
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s && !COUNTRY_SEGMENTS.has(s.toLowerCase()));
+
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const state = stateFromSegment(parts[i]);
+    if (!state) continue;
+    return {
+      state,
+      zip: parts[i].match(ZIP_SUFFIX_RE)?.[1] ?? "",
+      city: i > 0 ? parts[i - 1] : "",
+    };
+  }
+  return { state: "", zip: "", city: "" };
+}
+
 /**
  * Extract a 5-digit US zip from a freeform address string.
+ * Prefers the zip attached to the state segment, so a 5-digit street number
+ * ("12345 Main St, Denver, CO 80202") cannot be mistaken for one.
  * Returns "" if no zip is found.
  */
 export function extractZip(address) {
   if (typeof address !== "string") return "";
+  const { zip } = parseAddress(address);
+  if (zip) return zip;
   const m = address.match(/\b(\d{5})(?:-\d{4})?\b/);
   return m ? m[1] : "";
 }
 
 /**
- * Extract the city from a US-format address string.
- * Matches the segment immediately before the state code + zip,
- * so "123 Main St, Denver, CO 80216" → "Denver" and
- * "457 Mountain Village Blvd, Telluride, CO 81435" → "Telluride".
- * Returns "" when no match (e.g. address has no STATE ZIP suffix).
+ * Extract the city from a US-format address string: the segment before the state.
+ * "123 Main St, Denver, CO 80216" → "Denver", "Aurora, CO 80011" → "Aurora",
+ * "123 Main St, Denver, CO" → "Denver".
+ * Returns "" when there is no state segment to anchor on, or nothing before it.
  */
 export function extractCity(address) {
   if (typeof address !== "string") return "";
-  const m = address.match(/,\s*([^,]+?),\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?\b/);
-  return m ? m[1].trim() : "";
+  return parseAddress(address).city;
 }
 
 /**
@@ -72,8 +130,7 @@ export function isZipQuery(s) {
  */
 export function extractState(address) {
   if (typeof address !== "string") return "";
-  const m = address.match(/,\s*([A-Z]{2})\s+\d{5}(?:-\d{4})?\b/);
-  return m ? m[1] : "";
+  return parseAddress(address).state;
 }
 
 const STATE_NAME_TO_CODE = {

@@ -20,6 +20,14 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
   const contactSourceChoices = {
     choices: [{ name: "Scraped" }, { name: "Hunter" }, { name: "Manual" }, { name: "Apollo" }],
   };
+  // Who the email is written TO, which is independent of the segment it is about.
+  // "Agency" is a firm that places other people's groups (a wedding or corporate
+  // planner). "In-house" is an employer booking for its own team, reached through
+  // the Apollo path. The two need different copy: an agency plans events as its
+  // business, so a lead-in like "your work planning retreats" is true of it and
+  // insulting nonsense to an HR director who does it once a year. Travel claims do
+  // not vary by audience, so this is deliberately NOT a segment.
+  const audienceChoices = { choices: [{ name: "Agency" }, { name: "In-house" }] };
 
   const firms = {
     name: "Firms",
@@ -28,6 +36,7 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
       { name: "city-metro", type: "singleLineText" },
       { name: "website-url", type: "url" },
       { name: "segment", type: "singleSelect", options: segmentChoices },
+      { name: "audience", type: "singleSelect", options: audienceChoices },
       { name: "source", type: "singleLineText" },
       { name: "zip", type: "singleLineText" },
       { name: "search-market", type: "singleLineText" },
@@ -76,6 +85,7 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
     fields: [
       { name: "subject", type: "singleLineText" },
       { name: "segment", type: "singleSelect", options: segmentChoices },
+      { name: "audience", type: "singleSelect", options: audienceChoices },
       { name: "body", type: "multilineText" },
       { name: "sign-off", type: "singleLineText" },
       { name: "updated-at", type: "singleLineText" },

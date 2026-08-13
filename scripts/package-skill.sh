@@ -10,17 +10,17 @@
 #   scripts/package-skill.sh <skill-name>       # one skill
 #   scripts/package-skill.sh --all              # every skill under skills/
 #
-# Output: dist/<name>.skill  (build artifacts; dist/ is gitignored)
+# Output: install/<name>.skill  (committed to the repo — this is what people download)
 #
 # Example:
 #   scripts/package-skill.sh firm-discovery
-#   → dist/firm-discovery.skill  (upload this in Claude Desktop → Settings → Skills)
+#   → install/firm-discovery.skill  (upload this in Claude Desktop → Settings → Skills)
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/skills"
-DIST_DIR="$REPO_ROOT/dist"
+INSTALL_DIR="$REPO_ROOT/install"
 
 usage() {
   echo "Usage: scripts/package-skill.sh <skill-name> | --all" >&2
@@ -44,8 +44,8 @@ package_one() {
     return 1
   fi
 
-  mkdir -p "$DIST_DIR"
-  local out="$DIST_DIR/$name.skill"
+  mkdir -p "$INSTALL_DIR"
+  local out="$INSTALL_DIR/$name.skill"
   rm -f "$out"
 
   # Zip the folder CONTENTS at the archive root (not the folder itself), so the
@@ -63,7 +63,7 @@ package_one() {
     return 1
   fi
 
-  echo "✓ dist/$name.skill"
+  echo "✓ install/$name.skill"
   grep -E '^\s+[0-9]' <<<"$listing" | awk '{print "    " $4}' || true
 }
 

@@ -8,5 +8,6 @@
   { "from": "config/region-travel.js",           "to": "skills/email-generation/region-travel.mjs" },
   { "from": "config/region-naming.js",           "to": "skills/email-generation/region-naming.mjs" },
   { "from": "config/client-data.json",           "to": "skills/email-generation/client-data.json" },
-  { "from": "config/airtable-schema.mjs",        "to": "skills/client-onboarding/table-schema.mjs" }
+  { "from": "config/airtable-schema.mjs",        "to": "skills/client-onboarding/table-schema.mjs" },
+  { "from": "docs/onboarding/worksheet-template.md", "to": "skills/client-onboarding/worksheet-template.md" }
 ]

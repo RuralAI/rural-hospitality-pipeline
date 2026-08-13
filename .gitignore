@@ -13,9 +13,9 @@ node_modules/
 .DS_Store
 
 # Packaged skills: the .skill installables ARE tracked (users download them);
-# ignore everything else that lands in dist/.
-dist/*
-!dist/*.skill
+# ignore everything else that lands in install/.
+install/*
+!install/*.skill
 
 # Session handoff notes — internal working notes, never published. Written each
 # session per the maintainer's own workflow; kept local, out of the repo.

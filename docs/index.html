@@ -313,6 +313,10 @@
   .note .ic { color: var(--amber); font-weight: 700; }
   .note.good { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
   .note.good .ic { color: var(--accent); }
+  /* Corporate-segment aside: neutral, so it reads as "only if this is you"
+     rather than as a warning (amber) or a tip (green). */
+  .note.corp { background: var(--surface-2); border-color: color-mix(in srgb, var(--muted) 30%, transparent); }
+  .note.corp .ic { color: var(--muted); }
 
   .tip-row { display: grid; gap: 12px; margin-top: 8px; }
   @media (min-width: 640px) { .tip-row { grid-template-columns: 1fr 1fr; } }
@@ -390,7 +394,7 @@
             <ul class="check">
               <li><span class="mark">1</span><span>Go to <a class="lnk" href="https://serper.dev" target="_blank" rel="noopener">serper.dev</a> and sign up &mdash; free, no credit card (Google sign-in works). You start with 2,500 free searches.</span></li>
               <li><span class="mark">2</span><span>Open your dashboard and click <strong>API Key</strong> in the left sidebar.</span></li>
-              <li><span class="mark">3</span><span>Copy the key and keep it handy. You'll paste it when <strong>Step 1 (Find planners)</strong> asks.</span></li>
+              <li><span class="mark">3</span><span>Copy the key and keep it somewhere handy. Once your base exists, it goes in the <strong>Config</strong> table under <strong>serper-api-key</strong>, and <strong>Step 1 (Find planners)</strong> picks it up from there.</span></li>
             </ul>
           </div>
         </div>
@@ -407,7 +411,7 @@
             <ul class="check">
               <li><span class="mark">1</span><span>Go to <a class="lnk" href="https://hunter.io" target="_blank" rel="noopener">hunter.io</a> and create a free account (email or Google).</span></li>
               <li><span class="mark">2</span><span>Click your profile icon (top right) and choose <strong>API</strong> &mdash; or go straight to <a class="lnk" href="https://hunter.io/api-keys" target="_blank" rel="noopener">hunter.io/api-keys</a>.</span></li>
-              <li><span class="mark">3</span><span>Copy the key. You'll paste it when <strong>Step 3's pass 2</strong> asks. The free plan has a small monthly limit &mdash; your dashboard shows how many searches you have left.</span></li>
+              <li><span class="mark">3</span><span>Copy the key. Once your base exists, it goes in the <strong>Config</strong> table under <strong>hunter-api-key</strong>, and <strong>Step 3's pass 2</strong> picks it up from there. The free plan has a small monthly limit &mdash; your dashboard shows how many searches you have left.</span></li>
             </ul>
           </div>
         </div>
@@ -425,7 +429,7 @@
               <li><span class="mark">1</span><span>Go to <a class="lnk" href="https://apollo.io" target="_blank" rel="noopener">apollo.io</a> and create a free account &mdash; free tier is 75 credits/month, similar to Hunter's limit.</span></li>
               <li><span class="mark">2</span><span>Click <strong>Admin Settings</strong> (bottom-left navigation) &rarr; <strong>Integrations</strong>. This opens the developer portal.</span></li>
               <li><span class="mark">3</span><span>In the developer portal's left navigation, click <strong>Integrations</strong> &rarr; <strong>API Keys</strong> and generate one.</span></li>
-              <li><span class="mark">4</span><span>Copy the key and keep it handy. You'll paste it when running the corporate-research skill. Skip this if you're only targeting weddings.</span></li>
+              <li><span class="mark">4</span><span>Copy the key and keep it somewhere handy. Once your base exists, it goes in the <strong>Config</strong> table under <strong>apollo-api-key</strong>, and the Apollo search picks it up from there. Skip this if you're only targeting weddings.</span></li>
             </ul>
           </div>
         </div>
@@ -456,9 +460,9 @@
           <h3 style="margin-top:0">Get the project ready</h3>
           <ul class="check" style="margin-top:14px">
             <li><span class="mark">✓</span><span><strong>Create a new project in Claude.</strong> <span class="sub">Name it something clear like "Email Outreach." Everything below lives inside this project.</span></span></li>
-            <li><span class="mark">✓</span><span><strong>Connect Airtable and Gmail.</strong> <span class="sub">Settings → Connectors. This is where your list and your drafts live. When Airtable asks what Claude can access, choose <strong>"Everything you have access to"</strong> &mdash; Claude needs this level of access to build your base for you.</span></span></li>
-            <li><span class="mark">✓</span><span><strong>Add the skills CRAI sent you.</strong> <span class="sub">Settings → Skills → upload each file. They show up in every chat after that.</span></span></li>
-            <li><span class="mark">✓</span><span><strong>Have your keys ready.</strong> <span class="sub">The Serper and Hunter keys from "Before you begin" (plus Apollo if you're running corporate-research). When a step asks, paste the key in &mdash; nothing to set up in advance.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Connect Airtable and Gmail.</strong> <span class="sub">Settings → Connectors. This is where your list and your drafts live. Each one asks what Claude can access, and each asks differently. <strong>Airtable</strong> offers two choices: pick <strong>"Everything you have access to."</strong> <strong>Gmail</strong> shows a checklist: tick <strong>"Select all."</strong> Claude needs this much access to build your base and put drafts in your inbox.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Download the skills, then add them.</strong> <span class="sub">Go to the <a class="lnk" href="https://github.com/RuralAI/rural-hospitality-pipeline" target="_blank" rel="noopener">project page on GitHub</a>, click the green <strong>Code</strong> button, choose <strong>Download ZIP</strong>, and unzip it. The files you need are in the <strong>install</strong> folder, one ".skill" file per skill. Then in Claude: Settings → Skills → Add Skill, and upload each one. They show up in every chat after that.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Put your keys in the Config table.</strong> <span class="sub">The Serper and Hunter keys from "Before you begin" (plus Apollo if you're running corporate-research). Once Claude has built your base in Step A, open it, go to the <strong>Config</strong> table, and paste each key into the cell under its heading. Do this once and every step afterwards finds its own key.</span></span></li>
           </ul>
         </div>
 
@@ -476,7 +480,7 @@
               <div class="say-text mono">Onboard a new client.</div>
             </div>
             <dl class="result">
-              <dt>Action</dt><dd>First Claude asks two quick picks: your <strong>segment</strong> &mdash; the kind of planners you want to reach (wedding planners, corporate retreat planners, or both) &mdash; and whether this is a brand-new setup (yes, your first time). Then it interviews you about the property: name, location, how many guests you host, what makes it special, who signs the emails, and the airport guests <em>fly into</em>. Then it builds everything.</dd>
+              <dt>Action</dt><dd>First Claude asks <strong>two multiple-choice questions</strong>, one after the other. <strong>Which segments do you run?</strong> is the kind of planners you want to reach: wedding, corporate retreat, or both. <strong>Do you already have an Airtable base?</strong> is asking whether you have done this before: your first time, pick the option to create one fresh. (The exact wording varies a little each run.) Then it interviews you about the property: name, location, how many guests you host, what makes it special, who signs the emails, and the airport guests <em>fly into</em>. Then it builds everything.</dd>
               <dt>You approve</dt><dd>Just answer as they come &mdash; Claude asks one or two at a time, so there's nothing to fill in beforehand. Not sure on something? Say so and it'll help.</dd>
             </dl>
             <div class="note"><span class="ic">!</span><span>One quick click it will ask for: in the <strong>Firms</strong> table, add a field named <code class="inline">discovered-date</code> of type <strong>Created time</strong>. Once, and you're done.</span></div>
@@ -500,6 +504,27 @@
               <dt>Action</dt><dd>Claude asks how you write, then drafts your email templates and shows them to you.</dd>
               <dt>You approve</dt><dd>Read the drafts, ask for any tweaks, and approve. These become the emails you send later.</dd>
             </dl>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">C</div>
+            <div>
+              <h3>Work out who books corporate retreats</h3>
+              <p class="role">Corporate segment only. Skip this if you are targeting weddings.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="say">
+              <div class="say-label"><span>Prompt</span><button class="copy" data-copy="Run corporate-research for my target markets.">Copy</button></div>
+              <div class="say-text mono">Run corporate-research for my target markets.</div>
+            </div>
+            <dl class="result">
+              <dt>Action</dt><dd>Claude works through who actually books retreats at a company: an employee inside the business (an HR director or office manager), an outside agency hired for it, or a mix. It saves what it finds to a <strong>Corporate Research</strong> table as decision-maker profiles: the job titles to target and the size of company to look at.</dd>
+              <dt>You approve</dt><dd>You are answering questions about your market, so there is nothing to prepare. Read the profiles at the end and say if they look wrong.</dd>
+            </dl>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Do this before Step 1, not after.</strong> The profiles decide what Step 1 searches for, and they are the input Apollo needs later. Running discovery first still finds real agencies, it just searches without the benefit of the research.</span></div>
           </div>
         </div>
       </section>
@@ -527,7 +552,8 @@
               <dt>Action</dt><dd>Claude finds the planners in that area and lists them. Nothing is saved yet.</dd>
               <dt>You approve</dt><dd>Nothing &mdash; just look. Fill in the city and segment you're targeting. Keep <strong>small sample</strong> in the prompt: it tells Claude to pull just a first batch (about one page of firms) instead of a full run, so you can check quality and spend before going bigger.</dd>
             </dl>
-            <div class="note"><span class="ic">!</span><span>The first time you run this, Claude asks for your <strong>Serper key</strong> &mdash; paste in the one from "Before you begin." That's the search key doing the work.</span></div>
+            <div class="note"><span class="ic">!</span><span>Before your first run, put your <strong>Serper key</strong> in Airtable rather than pasting it into the chat. Open your base, go to the <strong>Config</strong> table, and paste the key into the cell under the <strong>serper-api-key</strong> heading. Claude picks it up from there every run, so you only do this once. While you are in there you can fill in <strong>hunter-api-key</strong> and <strong>apollo-api-key</strong> too, using the keys from "Before you begin," and later steps will just work.</span></div>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment:</strong> put <em>Corporate</em> in the prompt where it says segment, and finish <strong>Card C</strong> first. Corporate searches three phrasings per city instead of the one wedding uses, so it spends about three times the Serper credits. That is normal, and the small sample wording keeps the first run cheap.</span></div>
           </div>
         </div>
       </section>
@@ -549,8 +575,13 @@
             </div>
             <dl class="result">
               <dt>Action</dt><dd>Claude decides which results are genuine planners worth keeping and saves those to your list. It cross-checks each name against Google's category, so a rental company or venue that slipped in gets filtered out.</dd>
-              <dt>You approve</dt><dd>Mostly nothing &mdash; it saves the clear planners on its own. If a few are borderline (the name and Google's category disagree), Claude shows you those and asks yes or no. Just answer, and it writes the rest.</dd>
+              <dt>You approve</dt><dd>Just the close calls. Claude saves the obvious planners on its own and brings you only the handful it isn't sure about, usually where the firm's name and Google's category disagree. Answer yes or no on those and it writes the rest.</dd>
             </dl>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment: there is a second group of people to reach.</strong> Steps 1 and 2 find event planning <em>agencies</em>. They cannot find the HR director or office manager who books their own company's retreat, because those people have no listing to search. The prompt below goes after them: it uses the job titles from <strong>Card C</strong>, shows you the candidates it finds, and saves the ones you approve. Their email comes with them, so they skip Step 3 and go straight to Step 4.</span></div>
+            <div class="say" style="margin-top:16px">
+              <div class="say-label"><span>Corporate only &middot; in-house planners</span><button class="copy" data-copy="Run the Apollo search for my corporate profiles.">Copy</button></div>
+              <div class="say-text mono">Run the Apollo search for my corporate profiles.</div>
+            </div>
           </div>
         </div>
       </section>
@@ -571,15 +602,16 @@
               <div class="say-text mono">Run contact-extraction on the Firms &mdash; pass 1 (scrape).</div>
             </div>
             <dl class="result">
-              <dt>Action</dt><dd>Claude reads each planner's website and pulls an email address where it can.</dd>
-              <dt>You approve</dt><dd>Nothing. Want more coverage? Then also run the optional pass below.</dd>
+              <dt>Action</dt><dd>Claude reads each planner's website, pulls an email address where it can, and saves those straight into your Contacts table.</dd>
+              <dt>You approve</dt><dd>Nothing. The addresses are in Airtable as soon as this finishes, so they are safe even if you stop here. Want more coverage? Run the optional pass below and it fills in the gaps.</dd>
             </dl>
             <div class="say" style="margin-top:16px">
               <div class="say-label"><span>Optional &middot; find more</span><button class="copy" data-copy="Run pass 2 (Hunter enrichment).">Copy</button></div>
               <div class="say-text mono">Run pass 2 (Hunter enrichment).</div>
             </div>
-            <div class="note"><span class="ic">!</span><span>Pass 2 uses your <strong>Hunter key</strong> &mdash; paste it in when Claude asks.</span></div>
-            <div class="note good"><span class="ic">✓</span><span>Hunter only helps for planners with their own website domain. Many small firms use a Gmail address, so pass 2 may add nothing &mdash; that's normal, not a failure.</span></div>
+            <div class="note"><span class="ic">!</span><span>Pass 2 uses your <strong>Hunter key</strong>. If you put it in the <strong>Config</strong> table alongside the Serper one, Claude picks it up on its own and there is nothing to paste.</span></div>
+            <div class="note good"><span class="ic">✓</span><span>Pass 2 works on firms that have their own website domain, where it can fill in a missing address and put a real name to a generic "info@" one. Firms that use a Gmail address are already as complete as they are going to get, so a short pass 2 list usually means pass 1 did well.</span></div>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment: run this step as written.</strong> The agencies you kept in Step 2 have websites, so both passes work on them exactly as they do for wedding planners. The one difference is that anyone Apollo found already came with an email address, so this step has nothing to do for them and will pass over them.</span></div>
           </div>
         </div>
       </section>

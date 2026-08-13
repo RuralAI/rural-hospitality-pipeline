@@ -12,6 +12,8 @@ compatibility: Requires code execution. Airtable connector (reads Business Profi
 
 # Email Generation and Gmail Drafts
 
+**Version:** 1.0.0 · Center for Rural AI
+
 Turns Contacts into ready-to-send Gmail drafts. The approved template copy and
 per-region travel sentences come from Airtable (Email Templates, Region Travel),
 read via the connector in step 0; `compose.mjs` only substitutes the two tokens,
@@ -23,8 +25,8 @@ adds the greeting, and appends the signature.
 
 Read Business Profile (single row). If the table is empty, stop and tell the
 operator to run `client-onboarding` first. Read Email Templates. If it has no
-record for the segment you're generating, stop and tell the operator to run
-`voice-intake`'s template-drafting step first -- there is no bundled default to
+record for the segment *and audience* you're generating, stop and tell the
+operator to run `voice-intake`'s template-drafting step first -- there is no bundled default to
 fall back to. Read Region Travel and Region Naming (both may be empty or
 missing rows for some regions -- that's expected, not an error; a region with
 no Region Naming row just never matches, and falls back the same as an
@@ -39,7 +41,7 @@ Write these files in the working directory:
 
 ```json
 // email-templates.json -- array, one record per Email Templates row
-[{ "subject": "...", "segment": "Wedding", "body": "...", "sign-off": "..." }]
+[{ "subject": "...", "segment": "Wedding", "audience": "Agency", "body": "...", "sign-off": "..." }]
 ```
 
 ```json
@@ -55,14 +57,20 @@ Write these files in the working directory:
 ### 1. Read Contacts and linked Firms via the connector
 
 Read the Contacts table (plain name works for reads). For each contact you need:
-its email, its linked firm's name, and the market that firm was found in
+its email, its linked firm's name, the market that firm was found in
 (`search-market`, falling back to `city-metro`) so the right region travel line
-is chosen. Read the linked Firms to get the firm name and market.
+is chosen, and the firm's `audience`. Read the linked Firms to get all three.
+
+`audience` decides which template the contact gets. "Agency" (the default, and
+what every Maps-sourced firm is) means a firm that places other people's groups.
+"In-house" means an employer booking for its own team, which is what the Apollo
+path produces. Pass the firm's value straight through; treat a blank as "Agency".
+Do not infer it from anything else.
 
 Write a `contacts.json` array in the working directory:
 
 ```json
-[{ "email": "planner@firm.com", "firm": "Larkspur Events", "market": "Northgate", "segment": "Wedding", "name": "" }]
+[{ "email": "planner@firm.com", "firm": "Larkspur Events", "market": "Northgate", "segment": "Wedding", "audience": "Agency", "name": "" }]
 ```
 
 `name` is usually empty for scraped contacts, which produces a "Hello," greeting.

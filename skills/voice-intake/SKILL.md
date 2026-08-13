@@ -11,6 +11,8 @@ compatibility: Requires the Airtable connector (reads Business Profile, writes E
 
 # Voice Intake Skill
 
+**Version:** 1.0.0 · Center for Rural AI
+
 A short interview to capture how the client contact communicates, followed by a
 drafting step that turns that voice into approved outreach email copy saved to
 the Email Templates table. Run `client-onboarding` first - this skill reads
@@ -57,6 +59,22 @@ For each segment the client runs (from Business Profile `segments`), draft a
 complete outreach email using: the captured voice, the Business Profile facts,
 and the positioning notes from onboarding (primary goal, ideal customer, what to
 emphasize, what to steer away from).
+
+**Corporate needs two drafts, not one.** The segment reaches two different
+readers, and one template cannot serve both:
+
+- **Agency** (the default): an event planning firm that places other companies'
+  groups. Retreats are its business, so copy may refer to the reader's work
+  planning them, and the `{{firm}}` lead-in belongs here.
+- **In-house**: the HR director, Chief of Staff, or office manager who organises
+  their own company's offsite, reached through the Apollo path. They do not plan
+  events for a living. Copy that praises their event-planning business reads as a
+  mistake and gets deleted, so this draft must **not** use `{{firm}}` and should
+  speak to their team and their next offsite.
+
+Draft both whenever Corporate is in scope. Wedding has one audience, Agency, so it
+gets one draft. Present them as separate drafts for separate approval, since the
+operator may be happy with one and not the other.
 
 Each draft has: a `subject`, a `body`, and the `sign-off` closing wording from
 Step 1. Write the body so the pipeline's two runtime tokens still work - the
@@ -109,10 +127,16 @@ approved copy to Email Templates, and nothing reads this file back.
 
 ## Step 3: Write approved copy to Email Templates
 
-For each approved segment, write one Email Templates row: `subject`, `segment`,
-`body`, `sign-off`, and `updated-at` (today's date). Upsert per segment: read
-the table first; if a row for that segment exists, update it; otherwise create
-one. Never duplicate a segment's row.
+For each approved draft, write one Email Templates row: `subject`, `segment`,
+`audience`, `body`, `sign-off`, and `updated-at` (today's date). Upsert per
+segment **and audience**: read the table first; if a row with that same segment and
+audience exists, update it; otherwise create one. Never duplicate a pair.
+
+`audience` is "Agency" or "In-house" and is what `email-generation` matches a
+contact against. A Corporate client therefore ends with two rows, both
+`segment: "Corporate"`, one per audience. Leaving `audience` blank is read as
+"Agency", so never leave it blank on an in-house draft: the row would overwrite the
+agency template and in-house contacts would then fail to generate at all.
 
 Writes require ids, not names: use the Email Templates table id (`tbl...`) and
 field ids (`fld...`). If `list_tables_for_base` is unreliable, ask the operator

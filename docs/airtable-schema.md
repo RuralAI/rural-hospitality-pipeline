@@ -28,6 +28,7 @@ Two categories of location data are stored separately:
 | `city-metro` | Text | No | Firm's actual city, parsed from the place address. Empty if address parsing fails. |
 | `website-url` | URL | Yes | |
 | `segment` | Single select | Yes | `Wedding` \| `Corporate` |
+| `audience` | Single select | No | `Agency` \| `In-house`. Who the email is written to, independent of segment. `Agency` (the default, and every Maps-sourced firm) places other people's groups. `In-house` is an employer booking for its own team, written only by `corporate-research`'s Apollo step. Selects the Email Templates variant; blank reads as `Agency`. |
 | `source` | Text | Yes | Where found: ILEA directory, Google Maps, TheKnot, etc. |
 | `zip` | Text | No | Firm's actual 5-digit US zip, parsed from the place address. Never falls back to the search query. |
 | `search-market` | Text | No | The geography string used in the discovery search (e.g. `Telluride`, `Northgate`). Empty when the search was zip-based. |
@@ -51,7 +52,7 @@ Written by `contact-extraction`. Linked to Firms.
 | `email` | Email | Yes | Best/primary address. When multiple are found, the full set is in `all-emails` |
 | `all-emails` | Long text | No | All addresses found for the contact, one per line |
 | `email-verified` | Checkbox | Yes | Informational only. Scraped records start unchecked; it does not gate `email-generation`. Any contact with an email gets a draft. |
-| `contact-source` | Single select | No | `Scraped` \| `Hunter` \| `Manual` — how the email was obtained. The scrape pass writes `Scraped` |
+| `contact-source` | Single select | No | `Scraped` \| `Hunter` \| `Manual` \| `Apollo` — how the email was obtained. The scrape pass writes `Scraped` |
 | `firm-id` | Link to Firms | Yes | A firm with no linked Contact is the `needs_manual` signal — no email was found |
 | `linkedin-url` | URL | No | Additional personalization signal |
 
@@ -104,15 +105,18 @@ duplicate insert); read at runtime by `firm-review`, `contact-extraction`, and
 
 ### Email Templates
 
-Holds the approved outreach letter, one record per segment. Written by `voice-intake`
-(after the owner approves the draft) and read by `email-generation`. Not linked to other
-tables. A segment with no record falls back to the shipped default in
-`config/email-templates.js`, so this table can start empty.
+Holds the approved outreach letter, one record per segment **and audience**. Written
+by `voice-intake` (after the owner approves the draft) and read by
+`email-generation`. Not linked to other tables. There is **no** fallback: a missing
+record is a hard stop, because the only copy that goes out is copy a human approved
+(`email-templates-store.mjs`). A Corporate client ends up with two records, both
+`segment: Corporate`, one per audience.
 
 | Field | Type | Notes |
 |-------|------|-------|
 | `subject` | Text | Approved subject line (primary field) |
-| `segment` | Single select | `Wedding` \| `Corporate` — one record per segment |
+| `segment` | Single select | `Wedding` \| `Corporate` |
+| `audience` | Single select | `Agency` \| `In-house`. Matched against the firm's `audience` to pick the variant. Blank reads as `Agency`, so never leave it blank on in-house copy: it would overwrite the agency record. |
 | `body` | Long text | Paragraphs separated by blank lines; keep `{{travel}}`/`{{firm}}` tokens verbatim |
 | `sign-off` | Text | e.g. `Warm regards,` |
 | `updated-at` | Text | ISO timestamp stamped by the skill that wrote the row |

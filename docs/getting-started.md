@@ -33,7 +33,7 @@ client, so the gotchas below are real ones we hit, not hypotheticals.
      `corporate-research`'s Apollo-backed Track A candidate search) from
      apollo.io — free tier is 75 credits/month, similar low volume to
      Hunter's; a paid plan is needed for real enrichment spend
-5. **The 6 run-flow skill files** from `dist/`: `client-onboarding`,
+5. **The 6 run-flow skill files** from `install/`: `client-onboarding`,
    `voice-intake`, `firm-discovery`, `firm-review`, `contact-extraction`,
    `email-generation`. These are the pipeline, run in order.
    (`corporate-research` is **optional** — a Desktop research skill for clients

@@ -10,6 +10,13 @@
  * travel line is the literal token {{travel}}; the optional firm lead-in is the
  * token {{firm}} (Corporate); the signature is appended by the renderer from
  * config/client-data.json. House style: no em dashes.
+ *
+ * Keys are the segment for the default "Agency" audience, and "<Segment> In-house"
+ * for an employer booking its own team. Same segment, different reader: an agency
+ * places other people's groups as its business, so "your work planning retreats"
+ * is a true and flattering opener. Said to an HR director who organises one
+ * offsite a year, it reads as a mistake and gets the mail deleted. The in-house
+ * copy therefore drops the {{firm}} lead-in entirely and speaks to the team.
  */
 const emailTemplates = {
   Wedding: {
@@ -31,6 +38,18 @@ const emailTemplates = {
       "Example Inn is a restored historic home in the heart of Rivertown, Colorado. A team books the whole property (one group at a time) so the setting stays private and free of hotel distractions. There's dedicated space for presentations and strategy sessions, Wi-Fi throughout, and breakfast is served each morning around whatever the group needs.",
       "{{travel}} We also keep availability outside the peak summer months, and we can assist in planning and coordinating the extras that round out a retreat, such as a catered dinner at the inn or a guided hike.",
       "If Example Inn sounds like a fit for a team you're working with, just reply and we'll send a one-page overview.",
+    ],
+    signOff: "Warm regards,",
+  },
+  "Corporate In-house": {
+    subject: "A private option for your next team offsite",
+    segment: "Corporate",
+    audience: "In-house",
+    bodyParagraphs: [
+      "We're Alex and Sam Rivera, the innkeepers at Example Inn in Rivertown. We're reaching out because you're the person who tends to organize the offsite where you work, and we wanted to put a private option on your radar for the next one.",
+      "Example Inn is a restored historic home in the heart of Rivertown, Colorado. Your team books the whole property, one group at a time, so there are no other guests and no hotel lobby to work around. There's dedicated space for presentations and working sessions, Wi-Fi throughout, and breakfast each morning around whatever the schedule needs.",
+      "{{travel}} We also keep availability outside the peak summer months, and we can help arrange the extras that make a retreat feel worth the trip, such as a catered dinner at the inn or a guided hike.",
+      "If it sounds like it could suit your team, just reply and we'll send a one-page overview with group rates.",
     ],
     signOff: "Warm regards,",
   },

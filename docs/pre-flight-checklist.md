@@ -28,7 +28,7 @@ Everything you need in hand before running the pipeline in Claude Desktop. Work 
 
 ## 4. The 6 skills to upload
 
-Upload these `.skill` files from `dist/` into the project. They run in this order:
+Upload these `.skill` files from `install/` into the project. They run in this order:
 
 - [ ] `client-onboarding.skill`
 - [ ] `voice-intake.skill`

@@ -11,6 +11,8 @@ compatibility: Airtable connector required (reads Business Profile, writes Firms
 
 # Firm Review (Keep / Review / Discard)
 
+**Version:** 1.0.0 · Center for Rural AI
+
 Option A review: triage happens in chat, and only Keepers are written to Firms.
 No review table, no extra Airtable layer. Evaluate in two steps: categorize
 first, then assess quality.
@@ -87,6 +89,12 @@ retreat/offsite planning and there is a named individual with a relevant title.
 Only records marked Keep. Dedup on the normalized firm-name against existing
 Firms rows before writing. Append `. Audit: <reason>` to the `notes` field.
 
+Set `audience` to **"Agency"** on every row you write. Everything reaching this
+skill came from a Maps search, so it is a firm that places other people's groups,
+which is what the segment's normal template is written for. The other value,
+"In-house", belongs to employers booking for their own team and is written only by
+`corporate-research`'s Apollo step.
+
 Note: the normalized-name match strips only corporate suffixes (LLC, Inc, Co,
 Company, ...), not descriptive words like "Events"/"Weddings" — that's a
 deliberate choice to avoid falsely merging two distinct firms. So this step is
@@ -110,6 +118,40 @@ Reason: [1 to 2 sentences]
 Action: [what to do next]
 ```
 
-Batch: a summary table (Firm, City, Category, Verdict, Reason), then counts by
-category, counts by verdict (planners only), patterns worth noting, and
-recommended next step.
+Batch: report in this order, and keep the prose short — the operator is here to
+make decisions, not to read an essay.
+
+1. **One line of counts.** Total reviewed, counts by category, counts by verdict.
+2. **Keepers: one line.** How many were written to Firms. Do not list them all;
+   they are in Airtable now and the operator can look. Name only near-duplicates
+   you deliberately did not write, if any.
+3. **Reviews: a numbered decision table.** This is the part the operator acts on,
+   so it comes last and gets the most care. One row per Review, in this shape:
+
+   | # | Firm | Why it's held | Look here | Suggested |
+   | --- | --- | --- | --- | --- |
+   | 1 | Jennifer Lane Events | No website found | [search](https://www.google.com/maps/search/?api=1&query=Jennifer+Lane+Events+Denver+CO) | Keep, follow up by phone |
+   | 2 | Birch and Honey Collective | Missing city-metro | [birchandhoney.example](https://birchandhoney.example) | Keep if Denver metro |
+
+   Rules for the table:
+   - **Every row gets a link.** Use the firm's website when discovery found one.
+     When it did not, build a Maps search link:
+     `https://www.google.com/maps/search/?api=1&query=<firm name + city, URL-encoded>`.
+     The operator should never have to retype a name into Google themselves.
+   - **"Why it's held" is one short phrase**, not a sentence. "No website",
+     "Missing city-metro", "Site says film and commercial work now".
+   - **"Suggested" is your actual recommendation**, so answering is one word for
+     most rows. Do not write "needs research" — you have already done the research.
+4. **Then ask for the decisions in one prompt:** invite them to reply with row
+   numbers, e.g. "keep 1 and 4, discard 2, skip the rest." Apply their answer,
+   write the Keeps to Firms the same way as Step 3, and confirm what was written.
+
+**Never end your turn with Reviews unresolved and unmentioned.** They live only in
+this conversation — nothing about them is saved. If the operator leaves them
+undecided, say plainly that they will be lost when the session ends and that
+re-running discovery for that city is what recovers them.
+
+If a Review's only gap is a missing `city-metro` or zip that you can determine
+confidently from the firm's own site or its Maps listing, fill it in and say you
+did rather than holding the row for that alone. Hold on judgment calls, not on
+data you can look up.

@@ -11,11 +11,16 @@ compatibility: Requires code execution and the Airtable connector (creates table
 
 # Client Onboarding Skill
 
+**Version:** 1.0.0 · Center for Rural AI
+
 Turns a completed onboarding worksheet (or a live interview) into a ready-to-run
 Airtable base: it provisions the tables, writes the single-row Business Profile,
 and writes approved Region Travel sentences. The worksheet questions are in
-`docs/onboarding/worksheet-template.md`. Voice and email copy are captured
-separately by the `voice-intake` skill (see the handoff at the end).
+`worksheet-template.md`, bundled alongside this file: read it and work through its
+sections in order. Most operators have not filled it in beforehand, so interview
+them live rather than asking them to go find it. If they do paste in a completed
+worksheet, take the answers from that instead of re-asking. Voice and email copy
+are captured separately by the `voice-intake` skill (see the handoff at the end).
 
 Nothing is written to the repo. Everything this skill produces lives in the
 client's own Airtable base, read at runtime by the four pipeline skills.

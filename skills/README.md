@@ -61,19 +61,19 @@ the repo's packaging script — no Python, no external tooling:
 
 ```bash
 # From the repo root
-scripts/package-skill.sh firm-discovery   # one skill  → dist/firm-discovery.skill
+scripts/package-skill.sh firm-discovery   # one skill  → install/firm-discovery.skill
 scripts/package-skill.sh --all            # every skill that has a SKILL.md
 ```
 
 The script zips every file in `skills/<name>/` at the archive root (the layout
 Claude Desktop installs cleanly), skips junk like `.DS_Store`, and verifies
-`SKILL.md` made it in. Output lands in `dist/` (a gitignored build directory —
-regenerate any time; don't hand-edit the `.skill`).
+`SKILL.md` made it in. Output lands in `install/`, which **is** committed — it is
+what people download. Regenerate it any time; never hand-edit a `.skill`.
 
 To build one by hand instead, it's just:
 
 ```bash
-cd skills/firm-discovery && zip -X ../../dist/firm-discovery.skill SKILL.md discover.mjs lib.mjs lib.test.mjs
+cd skills/firm-discovery && zip -X ../../install/firm-discovery.skill SKILL.md discover.mjs lib.mjs lib.test.mjs
 ```
 
 ---

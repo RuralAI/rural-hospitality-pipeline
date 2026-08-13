@@ -13,6 +13,8 @@ compatibility: Requires code execution with network egress. Airtable connector r
 
 # Contact Extraction
 
+**Version:** 1.0.0 · Center for Rural AI
+
 Turns discovered Firms into Contact records, one best email each. The scrape
 logic is the real Stage 02 core (`stage-02-extraction.mjs`), unchanged.
 `extract.mjs` is the runner: input loading, a resumable holding file, progress
@@ -68,7 +70,38 @@ Each result carries: `firm_id` (the link key), `email` (best), `all_emails`,
 `status` ("found" or "needs_manual"), `contact_source` ("Scraped"), and
 `email_verified` (always false: scraping is not deliverability).
 
-### 3.5. Optional: enrich weak results with Hunter
+### 4. Write Contacts via the connector, before offering pass 2
+
+**Write as soon as pass 1 finishes. Do not hold results back waiting for a
+decision about Hunter.** Everything up to this point lives only in
+`stage-02-results.json` in the session's working directory. That file is crash-safe
+*within* a session, but it does not survive the session ending: a closed tab, a
+dropped connection, or a hit session limit takes the whole batch with it, and any
+Hunter credits already spent are spent for nothing. Airtable is the only durable
+place, so get the rows in early. Pass 2 updates them in place (step 6), so writing
+first costs nothing.
+
+For each `found` result, create one Contact linked to its firm. **Write them
+without asking** — this is the step the operator asked for, and a Contact with an
+email is never the wrong outcome.
+
+Skip `needs_manual` results by default: a blank-email Contact is a row
+`email-generation` cannot send to, so it buys nothing and clutters the table. The
+firm stays in Firms either way, so nothing is lost and the Hunter pass (step 5) or
+a later re-run can still fill it in. Only write blank-email placeholders if the
+operator asks for them by name.
+
+Writes require ids, not names. The create tool rejects the plain table name. You
+need the Contacts table id (`tbl...`) and field ids (`fld...`). If
+`list_tables_for_base` does not return them reliably, ask the operator to open
+the Contacts table in Airtable and paste the URL: the `tbl` id is in it. Pass the
+linked firm as a list containing the firm record id string. Pass `email-verified`
+as boolean false.
+
+Keep the firm id → Contact record id mapping from these writes. Step 6 needs it to
+update rather than duplicate.
+
+### 5. Optional: enrich weak results with Hunter
 
 `extract.mjs`'s scrape alone finds an address, not a person, and often
 nothing usable at all — a Hunter Domain Search pass recovers named contacts
@@ -76,8 +109,11 @@ and upgrades generic inboxes on the firms the scrape left weak.
 
 A Hunter key is required (a paid plan — the free tier's 25 searches/month
 isn't meaningful at real batch volume; the first paid tier's 24K credits is).
-Resolve it the same way `discover.mjs` resolves Serper's: paste it in chat as
-an env var, or upload a `hunter.key` file next to the script.
+Resolve it the same way `discover.mjs` resolves Serper's, and in the same order:
+read `hunter-api-key` from the single-row Airtable Config table via the connector
+first, and only if that cell is empty ask the user to paste one (telling them it
+belongs in base → Config table → `hunter-api-key`) or upload a `hunter.key` file
+next to the script. Do not echo the key back into the conversation.
 
 ```bash
 node enrich.mjs --hunter-key <key>
@@ -88,21 +124,23 @@ Reads `stage-02-results.json` (from step 3) and `firms.json` (from step 1,
 for a `needs_manual` firm's website), queries Hunter only for firms that were
 `needs_manual` or had a generic shared-inbox address, and writes
 `stage-02-final.json` — same crash-safe/resumable pattern as `extract.mjs`.
-If this step runs, step 4 reads from `stage-02-final.json` instead of
-`stage-02-results.json`; otherwise nothing about step 4 changes.
 
-### 4. Write Contacts via the connector
+### 6. Update Contacts with what pass 2 won
 
-For each `found` result, create one Contact linked to its firm. `needs_manual`
-results can be written with a blank email (the no-email signal) or skipped for a
-demo.
+Read `stage-02-final.json` and reconcile it against what step 4 already wrote.
+Same rule as step 4: apply it, do not ask first. Per firm:
 
-Writes require ids, not names. The create tool rejects the plain table name. You
-need the Contacts table id (`tbl...`) and field ids (`fld...`). If
-`list_tables_for_base` does not return them reliably, ask the operator to open
-the Contacts table in Airtable and paste the URL: the `tbl` id is in it. Pass the
-linked firm as a list containing the firm record id string. Pass `email-verified`
-as boolean false.
+- **Hunter won, and the firm already has a Contact** (it was `found` in pass 1):
+  update that record in place. Set `email`, `all-emails`, `first-name`,
+  `last-name`, `title`, and `contact-source` to "Hunter". Update, never create, or
+  you get two Contacts for one firm.
+- **Hunter recovered a firm that was `needs_manual`** (so step 4 skipped it):
+  create the Contact now, exactly as step 4 would have.
+- **The scrape held:** leave the record alone.
+
+Then report, briefly: how many records gained a real name, how many firms were
+recovered from `needs_manual`, and the running total of Contacts. Do not re-list
+every firm — the table is in Airtable, and they can look.
 
 ## Field mapping (holding file to Contacts)
 
@@ -112,13 +150,35 @@ as boolean false.
 - `email_verified` to `email-verified` (false)
 - `firm_id` to `firm-id` (link: a list holding the firm record id)
 - first-name, last-name, title: blank unless the Hunter enrichment step
-  (3.5) ran and won for that firm — the scrape alone yields no name.
+  (step 5) ran and won for that firm — the scrape alone yields no name.
 - `contact_source` is "Scraped" unless Hunter's result won, in which case
   it's "Hunter".
 
+## Reporting pass 1
+
+The operator wants to know it worked and what to do next. They do not want a
+per-firm audit. Keep the whole report to a few lines, in this shape:
+
+1. **Lead with the result.** "10 of your 14 firms now have a contact email, saved
+   to Contacts." That is the headline, and it goes first.
+2. **Name only the firms with no email**, as a short list. These are the ones the
+   next step goes after, so they are the only per-firm detail that earns its place.
+3. **Close with the Hunter prompt**, as an invitation to one action: say that
+   Hunter can chase the ones that came up empty and can also put a real name to
+   the generic `info@` style addresses, then ask if they want to run it.
+
+Do **not** put in the pass 1 report: a table of every firm and its address, hit
+rate percentages or commentary on whether the rate is good, an explanation of why
+`first-name`/`title` are blank, the `email_verified` or `contact_source` values, or
+Hunter's pricing tiers. All of that is either already visible in Airtable or
+irrelevant to the one decision in front of them.
+
+Never end pass 1 with two open questions. The `needs_manual` firms are handled by
+the default above, so the only question is whether to run Hunter.
+
 ## Known limits
 
-- Scraping finds an address, not a person. The optional Hunter step (3.5)
+- Scraping finds an address, not a person. The optional Hunter step (step 5)
   recovers names for weak results; without it, or where Hunter also comes up
   empty, names stay blank.
 - `fetch()` plus regex only. No paid APIs, no new dependencies.

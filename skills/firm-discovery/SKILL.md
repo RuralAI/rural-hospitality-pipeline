@@ -15,6 +15,8 @@ compatibility: Requires code execution with network egress enabled. Serper API k
 
 # Firm Discovery
 
+**Version:** 1.0.0 · Center for Rural AI
+
 Runs one Stage 01 discovery pass and returns firm records. Four files: this
 doc, `discover.mjs` (the CLI entry point), `lib.mjs` (pure helpers, covered by
 `lib.test.mjs` — run `node --test lib.test.mjs` any time the logic changes),
@@ -52,13 +54,47 @@ Confirm these are on (Settings > Capabilities):
 
 If either is off, stop and tell the user — nothing below works without them.
 
+**Corporate segment only: check that the research ran first.** When the segment is
+Corporate, read the Corporate Research table via the connector before searching. If
+the table is missing or has no rows, say so and offer the choice rather than
+silently proceeding:
+
+> Corporate discovery usually runs after `corporate-research`, which works out
+> whether retreats are booked in-house or through agencies and produces the job
+> titles to target. Nothing is in Corporate Research yet. I can run discovery now
+> and search for corporate event planning agencies, which is a real list either
+> way, or you can run `corporate-research` first and come back. Which do you want?
+
+If they say continue, continue without further comment — this is a recommendation,
+not a hard stop. It matters because those profiles are what Apollo's People Search
+needs as input later, so skipping the research now means backfilling it then. Only
+the Corporate segment gets this check; Wedding has no equivalent prerequisite.
+
 ## Key handling
 
-The script resolves the Serper key in this order:
+Resolve the Serper key in this order, and **do not ask the user for a key before
+checking the Config table** — that is where the setup instructions tell them to
+put it, so asking first is a step backwards for them.
 
-- **Paste in chat:** the user pastes the key in their message. Set it as an env var when you run the script: `SERPER_API_KEY=<key> node discover.mjs "Denver CO"`.
-- **Upload a file:** the user uploads a one-line file named `serper.key` (or a `.env`-style file). Place it in the working directory next to `discover.mjs`; the script reads it automatically.
-- **Config table (production path):** pull the key from the Airtable Config table via the connector, then set it as the env var per above.
+- **Config table (default):** read `serper-api-key` from the single-row Airtable
+  Config table via the connector, then set it as an env var when you run the
+  script: `SERPER_API_KEY=<key> node discover.mjs "Denver CO"`.
+- **Paste in chat (fallback):** if the Config cell is empty, tell the user where it
+  goes (base → Config table → `serper-api-key`) and offer to proceed with a pasted
+  key for this run. Same env var.
+- **Upload a file:** the user uploads a one-line file named `serper.key` (or a
+  `.env`-style file). Place it in the working directory next to `discover.mjs`; the
+  script reads it automatically.
+
+**If the operator says the key is in Config but your read came back empty, you are
+probably looking at the wrong base.** Do not repeat "Config is empty" back at them
+and do not fall back to asking for a paste. Instead: list the bases you can see,
+say which one you read and its base id, and ask them to confirm it matches the base
+in their browser URL. A workspace often holds many bases with similar names, and a
+base provisioned in an earlier session is easy to confuse with a newer one. Only
+after they confirm the base should you re-read Config, and only then treat an empty
+cell as genuinely empty. A read from earlier in this conversation is also stale the
+moment they say they have filled it in — always re-read before concluding.
 
 Do not echo the key back into the conversation.
 
@@ -73,6 +109,18 @@ node discover.mjs "Denver CO" --segment Wedding --max-pages 3 --existing-firms e
 ```
 
 If it's the very first run for this Airtable base (nothing in Firms yet), skip the connector fetch and omit `--existing-firms` — the script degrades cleanly to within-run-only dedup.
+
+**Run size.** Operators ask for these in plain words. Map them and run — do not
+stop to confirm the page count, and do not present it as an assumption to approve:
+
+| They say | Use | Roughly |
+| --- | --- | --- |
+| "small sample", "just a taste", "a first batch" | `--max-pages 1` | ~20 firms |
+| nothing about size | `--max-pages 3` (the default) | ~60 firms |
+| "full run", "everything", "go big" | `--max-pages 5` | ~100 firms |
+
+Report the size you used in the summary at the end, so they can ask for more. Only
+ask first if they name a size you cannot map to a page count.
 
 Expected: geocode succeeds, 3 pages fetched (GPS coords sent on every page), duplicates removed across pages, ~60 well-formed firm records printed as JSON, and a summary line reporting how many were skipped as already-in-Airtable and how many were flagged `outsideRegion`.
 

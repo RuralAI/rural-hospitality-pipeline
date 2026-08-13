@@ -24,33 +24,46 @@
  *
  * Usage:
  *   Batch:  node compose.mjs --input contacts.json  [--segment Wedding]
- *   Single: node compose.mjs --segment Wedding --market "Denver" --firm "Larkspur Events" --to a@b.com [--name Jane]
+ *   Single: node compose.mjs --segment Wedding --market "Denver" --firm "Larkspur Events" --to a@b.com [--name Jane] [--audience In-house]
  *
  * contacts.json is an array of:
- *   { "email": "...", "firm": "...", "market": "Denver", "segment": "Wedding", "name": "" }
+ *   { "email": "...", "firm": "...", "market": "Denver", "segment": "Wedding",
+ *     "audience": "Agency", "name": "" }
  * `market` is the search-market or city used to pick the region (search-market
  * preferred, city-metro as fallback). `segment` per item overrides --segment.
+ * `audience` is "Agency" (a firm placing other people's groups, the default) or
+ * "In-house" (an employer booking for its own team). It selects the template
+ * variant; it does NOT affect the travel sentence, which varies by region and
+ * segment only.
  *
  * Output: JSON array of { to, subject, body } to stdout.
  */
 
 import { readFileSync, existsSync } from "node:fs";
 import { loadBusinessProfile } from "./business-profile.mjs";
-import { loadEmailTemplates } from "./email-templates-store.mjs";
+import { loadEmailTemplates, templateKey } from "./email-templates-store.mjs";
 import { loadRegionTravel, resolveTravelSentence } from "./region-travel-store.mjs";
 import { loadRegionNaming, resolveRegionId } from "./region-naming-store.mjs";
 import { buildSignatureLines } from "./signature.mjs";
 
 /**
  * @param {{profile: object, templates: object, regionTravel: object, regionNaming?: Array, defaultSegment?: string}} deps
- * @returns {(item: {email:string,firm:string,market:string,segment:string,name:string}) => {to:string|null,subject:string,body:string}}
+ * @returns {(item: {email:string,firm:string,market:string,segment:string,audience?:string,name:string}) => {to:string|null,subject:string,body:string}}
  */
 export function createComposer({ profile, templates, regionTravel, regionNaming = [], defaultSegment = "Wedding" }) {
-  return function compose({ email, firm, market, segment, name }) {
+  return function compose({ email, firm, market, segment, audience, name }) {
     const seg = segment || defaultSegment;
-    const template = templates[seg];
+    const key = templateKey(seg, audience);
+    const template = templates[key];
     if (!template) {
-      throw new Error(`No Email Templates record for segment "${seg}". Known: ${Object.keys(templates).join(", ")}`);
+      // Never silently fall back to the Agency template for an In-house contact.
+      // That is exactly the failure this key exists to prevent: agency copy opens
+      // by praising the reader's event-planning business, which an employer does
+      // not have, so the mail reads as a mistake. Stop and say what is missing.
+      throw new Error(
+        `No Email Templates record for "${key}". Known: ${Object.keys(templates).join(", ")}. ` +
+          `Run the voice-intake skill to draft and approve copy for this segment and audience.`,
+      );
     }
 
     const regionId = resolveRegionId(market, regionNaming);
@@ -112,6 +125,7 @@ if (isMain) {
       firm: flag("firm"),
       market: flag("market"),
       segment: flag("segment"),
+      audience: flag("audience"),
       name: flag("name"),
     }];
   }

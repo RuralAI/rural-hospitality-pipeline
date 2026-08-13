@@ -33,7 +33,7 @@ Pipeline (run in order per city/segment):
 Optional:
 - `corporate-research` — guided research for the corporate-retreat segment; writes decision-maker profiles to the `Corporate Research` table (provisioned only when the client runs the Corporate segment). Also bundles `apollo-search.mjs`, an optional real discovery step (needs an Apollo key) that searches Apollo's People Search API for in-house decision-makers and writes them directly to `Firms`/`Contacts`.
 
-Each skill lives in `skills/<name>/SKILL.md`. Packaged installables are in `dist/`.
+Each skill lives in `skills/<name>/SKILL.md`. Packaged installables are in `install/`.
 
 ## Source of truth and anti-drift
 
@@ -45,18 +45,18 @@ Code travels **two hops**, and `npm test` guards both — a change has not shipp
 until it has made it through both:
 
 ```
-src/ + config/  --sync-->  skills/<name>/  --package-->  dist/<name>.skill
+src/ + config/  --sync-->  skills/<name>/  --package-->  install/<name>.skill
 ```
 
 - Hop 1 (`skills/sync.test.mjs`): bundled copies must match their canonical source.
-- Hop 2 (`skills/dist-drift.test.mjs`): each `dist/*.skill` must match its
-  `skills/<name>/` folder, file list and bytes. `dist/` is what people install, so
+- Hop 2 (`skills/install-drift.test.mjs`): each `install/*.skill` must match its
+  `skills/<name>/` folder, file list and bytes. `install/` is what people install, so
   editing a skill without repackaging ships stale logic to every new installation.
 
 ```bash
 npm run sync:skills        # regenerate bundled copies (hop 1)
 npm run sync:skills:check  # fail on drift (hop 1)
-npm run package:skills     # rebuild dist/*.skill (hop 2)
+npm run package:skills     # rebuild install/*.skill (hop 2)
 npm test                   # unit tests + both drift checks (Node built-in runner; no deps)
 ```
 
@@ -79,11 +79,33 @@ via sync, by `client-onboarding`'s connector-based provisioning.
 
 1. Edit the `SKILL.md` (and, for bundled logic, the canonical source in `src/`/`config/`).
 2. `npm run sync:skills` if you touched a synced source.
-3. `npm run package:skills` to rebuild the `dist/` installable.
+3. `npm run package:skills` to rebuild the `install/` installable.
 4. `npm test` — must pass, including both drift checks.
-5. Update `README.md`, `skills/README.md`, and `CHANGELOG.md` as needed.
+5. Add a `CHANGELOG.md` entry under `[Unreleased]`; update `README.md` and
+   `skills/README.md` as needed.
 
-Package **before** you test. The hop-2 drift check compares `dist/` against
+Package **before** you test. The hop-2 drift check compares `install/` against
 `skills/`, so testing first reports a stale-archive failure that repackaging is
 what actually fixes. Commit the rebuilt `.skill` alongside the source change —
 they are one logical change.
+
+## Versioning
+
+Full standard: `docs/versioning.md`. The short version:
+
+- **One version for the whole pilot**, held in `package.json`. `npm run sync:skills`
+  stamps it under the H1 of every `SKILL.md`, so it travels the same two hops as
+  the code and both drift checks guard it. Never hand-edit a stamp.
+- **Levels are defined by operator cost, not code size.** MAJOR = an existing
+  deployment needs work (any change to `config/airtable-schema.mjs` qualifies —
+  bases provisioned by the older `client-onboarding` lack the new table, field, or
+  select choice). MINOR = new capability, nothing breaks. PATCH = fix or wording.
+  A release mixing levels takes the highest one.
+- **Every release heading carries an `**Operator impact:**` line** naming which
+  skills to reinstall, or `Reinstall: none`. That line is the whole point of the
+  scheme: it is how someone knows whether to come back to the repo.
+- **Release =** bump `package.json` → move `[Unreleased]` into a dated heading →
+  `sync` → `package` → `npm test` → one commit → `git tag -a vX.Y.Z`.
+
+Do not bump the version for ordinary work in progress. Accumulate entries under
+`[Unreleased]` and cut one release when the batch of changes is done.
