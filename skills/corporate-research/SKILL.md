@@ -14,7 +14,7 @@ compatibility: Requires code execution with network egress enabled (for apollo-s
 
 # Corporate Research Skill
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 The corporate segment has a structural unknown that must be resolved before building
 a discovery pipeline: **who actually books corporate retreats?** This skill guides

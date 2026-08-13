@@ -11,7 +11,7 @@ compatibility: Requires the Airtable connector (reads Business Profile, writes E
 
 # Voice Intake Skill
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 A short interview to capture how the client contact communicates, followed by a
 drafting step that turns that voice into approved outreach email copy saved to

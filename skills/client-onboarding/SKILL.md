@@ -11,7 +11,7 @@ compatibility: Requires code execution and the Airtable connector (creates table
 
 # Client Onboarding Skill
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 Turns a completed onboarding worksheet (or a live interview) into a ready-to-run
 Airtable base: it provisions the tables, writes the single-row Business Profile,

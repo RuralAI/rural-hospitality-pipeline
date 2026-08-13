@@ -13,7 +13,7 @@ compatibility: Requires code execution with network egress. Airtable connector r
 
 # Contact Extraction
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 Turns discovered Firms into Contact records, one best email each. The scrape
 logic is the real Stage 02 core (`stage-02-extraction.mjs`), unchanged.

@@ -14,6 +14,12 @@ Version numbers cover all seven skills at once and are defined in
 
 ## [Unreleased]
 
+Nothing yet.
+
+---
+
+## [2.0.0] — 2026-08-12
+
 **Operator impact:** Reinstall all skills, and reconcile the schema on any base
 created by 1.0.0. Three fields are new or changed: an `"Apollo"` choice on
 `Contacts.contact-source`, and an `audience` single select on both `Firms` and

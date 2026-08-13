@@ -15,7 +15,7 @@ compatibility: Requires code execution with network egress enabled. Serper API k
 
 # Firm Discovery
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 Runs one Stage 01 discovery pass and returns firm records. Four files: this
 doc, `discover.mjs` (the CLI entry point), `lib.mjs` (pure helpers, covered by

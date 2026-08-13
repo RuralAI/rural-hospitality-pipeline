@@ -12,7 +12,7 @@ compatibility: Requires code execution. Airtable connector (reads Business Profi
 
 # Email Generation and Gmail Drafts
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 Turns Contacts into ready-to-send Gmail drafts. The approved template copy and
 per-region travel sentences come from Airtable (Email Templates, Region Travel),

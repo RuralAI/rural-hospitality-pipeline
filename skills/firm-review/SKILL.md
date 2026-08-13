@@ -11,7 +11,7 @@ compatibility: Airtable connector required (reads Business Profile, writes Firms
 
 # Firm Review (Keep / Review / Discard)
 
-**Version:** 1.0.0 · Center for Rural AI
+**Version:** 2.0.0 · Center for Rural AI
 
 Option A review: triage happens in chat, and only Keepers are written to Firms.
 No review table, no extra Airtable layer. Evaluate in two steps: categorize

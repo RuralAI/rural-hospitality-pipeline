@@ -1,6 +1,6 @@
 {
   "name": "rural-hospitality-pipeline",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Reusable Claude Skills pipeline for rural hospitality outreach: discover firms, review, extract contacts, and draft outreach email. Center for Rural AI.",
   "license": "Apache-2.0",
   "private": false,
