@@ -1,5 +1,8 @@
 # Pre-Flight Checklist — Before You Run the Pipeline
 
+> **Who this is for:** operators getting ready to run the pipeline. No coding
+> required. Changing the pipeline itself? See [`../CLAUDE.md`](../CLAUDE.md).
+
 Everything you need in hand before running the pipeline in Claude Desktop. Work top to bottom; if every box is checked, you're ready for Step 4 of `docs/getting-started.md` (running the skills). This is a readiness checklist, not the full walkthrough — `getting-started.md` is the step-by-step.
 
 ---

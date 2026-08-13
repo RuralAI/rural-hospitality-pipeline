@@ -1,5 +1,9 @@
 # Key-Handling Standard
 
+> **Who this is for:** maintainers, as the decision record behind the key rules.
+> **Operators need the practical version instead** — the "Where keys go" and "Key
+> safety" notes in [`pre-flight-checklist.md`](pre-flight-checklist.md) section 4.
+
 **Center for Rural AI · Market Segmentation & Outreach Pipeline**
 Decision owner: Amy · Decided: 2026-07-11 · Applies to: Skills-delivered pipeline (claude.ai)
 

@@ -2,6 +2,10 @@
 
 **Center for Rural AI**
 
+> **Who this is for:** operators — the business owner, or someone from CRAI
+> helping them set up and run outreach. No coding required. Changing the pipeline
+> itself? See [`../CLAUDE.md`](../CLAUDE.md) instead.
+
 This guide sets up the pipeline for a business that is new **to the pipeline**
 (not necessarily a new business) and runs it end to end. It is written for the
 operator doing the setup (which may be the business owner or a CRAI helper),

@@ -32,6 +32,27 @@ are already running the pipeline: it covers the computer you have already put
 other people's contact data on.
 
 ### Added
+- **[`docs/README.md`](docs/README.md), an index that says who each document is
+  for.** The folder held nine files in one flat list with nothing distinguishing
+  the four an operator needs from the five that are internal engineering
+  standards. A business owner opening `docs/` met "Bundled-Copy Drift in the
+  Skills Pipeline" and "Versioning and releases" with no way to tell those were
+  not steps they had missed. The index sorts them into operator and maintainer
+  tables, and GitHub renders it automatically when someone clicks into the folder.
+
+  Every document also opens with a one-line **Who this is for** banner, and the
+  maintainer ones say plainly that operators can skip them, with a pointer to the
+  operator-facing equivalent where one exists — `versioning.md` sends them to the
+  **Operator impact** line, `key-handling-standard.md` to the practical key notes
+  in the checklist, `skills/README.md` to `install/`.
+
+  Deliberately **no file moves.** Splitting into `docs/operator/` and
+  `docs/internal/` would look tidier and break two things: `docs/index.html` is
+  the path that publishes the GitHub Pages site, and
+  `docs/onboarding/worksheet-template.md` is synced into `client-onboarding.skill`
+  per `sync-manifest.json`. The index buys the same clarity for neither cost.
+  `worksheet-template.md` is also the one document with no banner, since it is
+  bundled into a skill and a repo-navigation note has no business inside it.
 - **A machine-security precondition, ahead of every other setup step.** The
   pipeline stores real people's names and work email addresses on the operator's
   computer, holds live Airtable and Gmail sessions plus three API keys, and drafts
@@ -161,6 +182,10 @@ other people's contact data on.
   `src`/`config` against `skills/`, never `skills/` against `install/`.
 
 ### Changed
+- **The walkthrough's footer no longer addresses a fictional inn.** It read
+  "Prepared for Example Inn, Rivertown — swap in your own business name and cities
+  as you go," a leftover from when the page was a per-client artifact. On a public
+  site it reads as a page someone forgot to finish. Now just the CRAI attribution.
 - **The `audience` split now appears in the docs an operator actually reads.** It
   had landed in the schema reference and nowhere else, so the one thing it asks of
   a Corporate client — approve **two** letters in `voice-intake`, not one — was

@@ -1,5 +1,10 @@
 # Airtable Schema
 
+> **Who this is for:** maintainers changing the schema or the code that reads it.
+> **Operators can skip this** — `client-onboarding` builds every table for you, and
+> you never create a field by hand except the one `discovered-date` step the
+> checklist calls out.
+
 One Airtable base. Three linked tables — Firms → Contacts → Outreach — plus standalone Business Profile, Email Templates, Region Travel, Region Naming, and Config tables; the with-review variant adds a Review table. Field names are canonical — the pipeline code and Claude prompts reference them exactly. Do not rename fields without updating the pipeline modules and prompt templates.
 
 **How the base gets built.** The `client-onboarding` skill provisions it through the

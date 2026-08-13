@@ -75,11 +75,13 @@ All seven skills share one version number. See **[docs/versioning.md](docs/versi
 
 ### Reference docs
 
-- **[docs/versioning.md](docs/versioning.md)** — version numbers, what they promise, and when to reinstall
-- **[docs/airtable-schema.md](docs/airtable-schema.md)** — the tables and fields the pipeline uses
-- **[docs/key-handling-standard.md](docs/key-handling-standard.md)** — where API keys may (and may not) live
-- **[docs/pre-flight-checklist.md](docs/pre-flight-checklist.md)** — before your first live batch
-- **[docs/onboarding/](docs/onboarding/)** — the intake and voice worksheets
+**[docs/](docs/) has an index** that sorts every document by who it's written for — four for operators, five internal. Start there if you're not sure which you need. The ones people ask for most:
+
+- **[docs/pre-flight-checklist.md](docs/pre-flight-checklist.md)** — *operators.* Before your first live batch, starting with securing your computer
+- **[docs/onboarding/](docs/onboarding/)** — *operators.* The intake and voice worksheets
+- **[docs/versioning.md](docs/versioning.md)** — *maintainers.* Version numbers, what they promise, and when to reinstall
+- **[docs/airtable-schema.md](docs/airtable-schema.md)** — *maintainers.* The tables and fields the pipeline uses
+- **[docs/key-handling-standard.md](docs/key-handling-standard.md)** — *maintainers.* Where API keys may (and may not) live
 
 ---
 

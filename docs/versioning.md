@@ -2,6 +2,10 @@
 
 **Center for Rural AI — Rural Hospitality Pilot**
 
+> **Who this is for:** maintainers cutting a release. **Operators can skip this** —
+> the only thing you need is the **Operator impact** line under each release
+> heading in [`../CHANGELOG.md`](../CHANGELOG.md), which tells you what to reinstall.
+
 How this pilot is versioned, what a version number promises, and what an operator
 has to do when one changes. This is the standard for maintaining CRAI pilots; a
 new pilot repo should copy it rather than invent its own.

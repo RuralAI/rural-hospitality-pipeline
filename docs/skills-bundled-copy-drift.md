@@ -1,5 +1,8 @@
 # Bundled-Copy Drift in the Skills Pipeline
 
+> **Who this is for:** maintainers editing skill files. **Operators can skip this
+> entirely** — it explains an internal build rule, not anything you do or check.
+
 Plain-language explainer of what "bundled-copy drift" is, why it happens, and
 what we're doing about it. Written 2026-07-13.
 

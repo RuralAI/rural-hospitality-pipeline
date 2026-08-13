@@ -1,5 +1,9 @@
 # Claude Skills
 
+> **Who this is for:** maintainers working on the skill sources in this folder.
+> **Operators want [`../install/`](../install/) instead** — that holds the packaged
+> `.skill` files you upload to Claude. Nothing in here is installable as-is.
+
 This folder contains [Claude Skills](https://support.claude.ai/hc/en-us/articles/27900216893325) — reusable AI instructions that extend Claude's behavior for specific tasks in this project.
 
 Skills are installed into Claude once and then available in any conversation. They are the primary way this project captures repeatable workflows so that team members and future CRAI deployments don't have to reinvent the process each time.

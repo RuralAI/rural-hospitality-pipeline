@@ -1,5 +1,8 @@
 # Voice Intake: Question Worksheet
 
+> **Who this is for:** operators, as optional prep. Fill it in before running
+> `voice-intake` to make that interview faster, or skip it and answer live.
+
 This captures how the person signing your outreach actually writes, so the emails sound like them and not like a template. It is **platform-agnostic**: deliver it as an Airtable form, a Google Doc, or a printed worksheet, whatever suits the client. The answers feed the `voice-intake` skill, which drafts your outreach copy in this voice and saves the approved templates to the Airtable **Email Templates** table.
 
 > **This is an optional prep aid, not a required input file.** The `voice-intake` skill asks these same questions live during its interview; filling this in first just makes that conversation faster and lets a client prepare offline. The skill does **not** read this file — it holds its own copy of the questions. So editing this worksheet will not change what the skill asks; if you want to change the interview itself, edit `skills/voice-intake/SKILL.md` Step 1.
