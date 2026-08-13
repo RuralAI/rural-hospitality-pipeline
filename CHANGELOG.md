@@ -23,7 +23,40 @@ generate drafts at all. Wedding-only deployments are unaffected beyond the
 reinstall: a blank `audience` reads as `Agency`, which is what every existing row
 already is.
 
+Two things here need no reinstall at all. **Pro and Max accounts can run this
+pipeline** — earlier docs said a Team plan was required, which was wrong; set
+**Settings → Capabilities → Allow network egress** to **"All domains"** and you
+are set. And **read the new machine-security gate**
+([`pre-flight-checklist.md`](docs/pre-flight-checklist.md), section 1) even if you
+are already running the pipeline: it covers the computer you have already put
+other people's contact data on.
+
 ### Added
+- **A machine-security precondition, ahead of every other setup step.** The
+  pipeline stores real people's names and work email addresses on the operator's
+  computer, holds live Airtable and Gmail sessions plus three API keys, and drafts
+  mail from the operator's own inbox. Nothing in the docs had ever asked whether
+  that computer was safe to put it on. Prompted by a real deployment: an operator's
+  machine was found to have malware, and setup is now held until the machine is
+  verified clean.
+
+  The exposure is not the operator's alone, which is why this is a gate and not
+  advice. The businesses in a Contacts table never agreed to trust anyone's
+  laptop, so a compromised machine turns an outreach project into a third-party
+  breach — theirs, the rural business's, and CRAI's. `pre-flight-checklist.md`
+  section 1 now carries the full gate (OS updates, a **full** scan that comes back
+  clean, browser-extension and startup-item review, disk encryption), the
+  Windows-specific Defender check, and a rotate-from-a-known-clean-machine
+  procedure for anyone whose scan has ever found something — including signing all
+  sessions out, since a stolen session token survives a password change.
+  `getting-started.md` leads its prerequisites with the condensed version,
+  `README.md` carries it before the install steps, and the walkthrough opens on a
+  new **Start here** section covering it in plain language.
+
+  Written for **both platforms deliberately.** The obvious framing was a Windows
+  warning, but the malware that matters here steals browser sessions, keychain
+  entries, and API keys, and it targets macOS too. A Mac-users-can-skip-this note
+  would have been wrong in the direction that costs someone their data.
 - **An `audience` dimension, so in-house corporate contacts get their own copy.**
   Found on a live Apollo run: the corporate template opens by referring to the
   reader's work planning retreats, which is true of an event agency and wrong for
@@ -65,6 +98,25 @@ already is.
   maintainer checklist in `CLAUDE.md` has been reordered accordingly.
 
 ### Fixed
+- **The docs turned away operators who could have run the pipeline.**
+  `pre-flight-checklist.md` and `getting-started.md` both required a **Team plan**
+  and said outright that Pro "will not work," which is wrong: code execution and
+  file creation are available on every Claude plan. The real requirement was never
+  the plan, it is the **"Allow network egress"** capability, which has to be set to
+  **"All domains"** because discovery and contact-extraction reach arbitrary firm
+  websites and the Serper, Hunter, and Apollo calls go to third-party domains.
+
+  The claim was also backwards about which plan is easy. **Pro and Max have network
+  access on by default** and the operator can set it themselves under **Settings →
+  Capabilities**. **Team and Enterprise have it off by default** (package managers
+  only) and need an **organization owner** to change it — so the plan the docs
+  demanded is the one with the extra blocker. Both docs now state the capability,
+  the per-plan default, where the setting lives, and link Anthropic's
+  [support article](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude),
+  and `README.md` and the walkthrough carry it too — the walkthrough had never
+  stated a plan requirement at all, and now opens on one.
+  `skills/firm-discovery/SKILL.md` already described egress correctly, so no skill
+  changed.
 - **Apollo-sourced contacts silently lost their travel sentence.** Apollo's People
   Search does not return an organization's city, so `city-metro` is blank on those
   Firms rows. `compose.mjs` resolves a region from `search-market` first and
@@ -109,6 +161,31 @@ already is.
   `src`/`config` against `skills/`, never `skills/` against `install/`.
 
 ### Changed
+- **The `audience` split now appears in the docs an operator actually reads.** It
+  had landed in the schema reference and nowhere else, so the one thing it asks of
+  a Corporate client — approve **two** letters in `voice-intake`, not one — was
+  documented only where nobody looks for instructions. Since `email-generation`
+  hard-stops rather than substituting agency copy, an operator could reach the last
+  step of a campaign before discovering the requirement. `README.md`,
+  `getting-started.md` (4.2 and 4.7), `pre-flight-checklist.md` (section 6), and
+  the walkthrough (Card B and Step 4) now each explain the two readers and why the
+  same letter cannot serve both.
+- **`corporate-research` is now a numbered step in `getting-started.md`.** Step 4
+  ran 4.1 through 4.6 and never mentioned it, so an operator following the guide
+  for a Corporate client silently skipped the step that everything else in that
+  segment depends on. It is now **4.3**, between `voice-intake` and
+  `firm-discovery`, marked Corporate-only, and carries what the live run taught:
+  the Apollo step's flagged out-of-band candidates, its reported title
+  distribution and the gaps in it, and that an unpublished `capacity` is fine
+  because the headcount band is only a search filter. `README.md` and
+  `pre-flight-checklist.md` state the ordering as well. The walkthrough already
+  had this right as setup Card C.
+- **`getting-started.md` steps 4.5 through 4.7 describe what the skills now
+  actually do.** They still described the pre-live-run behaviour: `firm-review`
+  returning prose rather than a numbered decision table whose rows are lost with
+  the session, `contact-extraction` holding every result to the end rather than
+  writing Contacts after pass 1, and no mention that Apollo-sourced contacts skip
+  the step entirely.
 - **Apollo's `--employee-range` format is confirmed against a live call.**
   `apollo-search.mjs` carried an honesty flag saying the string format
   `organization_num_employees_ranges[]` expects had never been verified, so the

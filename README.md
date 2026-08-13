@@ -24,17 +24,32 @@ Two setup skills run first, once per business:
 
 One optional skill:
 
-- **corporate-research** — a guided research process for the corporate-retreat segment (in-house vs. agency planners, who to target). Writes decision-maker profiles to an Airtable `Corporate Research` table. Only needed if you run the Corporate segment.
+- **corporate-research** — a guided research process for the corporate-retreat segment (in-house vs. agency planners, who to target). Writes decision-maker profiles to an Airtable `Corporate Research` table. Only needed if you run the Corporate segment, and **run it before discovery**, not after — it builds the profiles the later steps aim at. Its optional [Apollo](https://apollo.io) search reaches in-house decision-makers that a Maps search cannot see, writing them straight to `Firms` and `Contacts` behind its own approval step.
+
+### Who the email is written to
+
+Corporate outreach has two kinds of reader, and they need different letters. An **agency** plans other people's events for a living. An **in-house** contact — a VP of People, an office manager — organizes maybe one offsite a year. Agency copy sent to an in-house reader opens by praising a business they do not have, which reads as a mistake.
+
+So `Firms` and `Email Templates` each carry an **`audience`** (`Agency` | `In-house`), separate from segment. Maps-sourced firms are `Agency`; Apollo-sourced people are `In-house`; `email-generation` matches the two. A Corporate client approves **two** Corporate letters in `voice-intake`, one per audience. Blank reads as `Agency`, so Wedding-only deployments never encounter this.
 
 ---
 
 ## Getting started
 
-1. Read **[docs/getting-started.md](docs/getting-started.md)** for the full run-through (accounts, connectors, and API keys you'll need).
-2. Connect the **Airtable** connector with **workspace-level** access. Do not pre-create a base — `client-onboarding` creates it for you, so there is nothing to build by hand.
-3. Download the skills — see below. You do not need git, and you do not need to clone anything.
-4. Install them: in Claude, go to **Settings → Skills → Add Skill** and upload each `.skill` file.
-5. Run `client-onboarding`, then `voice-intake`, then the four pipeline skills in order.
+**What you need:** a **clean, secured computer** (see below), a **Claude account with Projects** on **any** plan — Pro, Max, Team, or Enterprise — with **Settings → Capabilities → Allow network egress** set to **"All domains"**, the **Airtable** and **Gmail** connectors, and a **Serper** API key. Egress is on by default for Pro and Max and off by default for Team and Enterprise, where an org owner has to change it. Details: [Create and edit files with Claude](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude).
+
+1. Confirm the computer you'll run this on is clean and secured — **[`docs/pre-flight-checklist.md`](docs/pre-flight-checklist.md), section 1**. Do this first; the rest of the list assumes it.
+2. Read **[docs/getting-started.md](docs/getting-started.md)** for the full run-through (accounts, connectors, and API keys you'll need).
+3. Connect the **Airtable** connector with **workspace-level** access. Do not pre-create a base — `client-onboarding` creates it for you, so there is nothing to build by hand.
+4. Download the skills — see below. You do not need git, and you do not need to clone anything.
+5. Install them: in Claude, go to **Settings → Skills → Add Skill** and upload each `.skill` file.
+6. Run `client-onboarding`, then `voice-intake`, then the four pipeline skills in order. (Corporate segment: run `corporate-research` after `voice-intake` and before `firm-discovery`.)
+
+### Before you install: the computer matters
+
+This pipeline stores real people's names and work email addresses on your machine, holds live Airtable and Gmail sessions plus your API keys, and drafts mail from your own inbox. The businesses you contact never agreed to trust your computer, so a compromised machine makes your outreach their breach.
+
+Before setup: full OS updates, a **full** malware scan that comes back clean, unrecognized browser extensions and startup items removed, disk encryption on. **This applies to Macs as well as Windows** — the malware that matters here steals browser sessions, keychain entries, and API keys, and it is written for macOS too. The full gate, including what to do if a scan has ever found something, is **[`docs/pre-flight-checklist.md`](docs/pre-flight-checklist.md), section 1**. On CRAI-assisted deployments we confirm this before setup begins.
 
 ### Downloading the skills
 

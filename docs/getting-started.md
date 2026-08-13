@@ -19,21 +19,40 @@ client, so the gotchas below are real ones we hit, not hypotheticals.
 > [`pre-flight-checklist.md`](./pre-flight-checklist.md). Come back here for
 > the step-by-step run.
 
-1. **A Claude account with Projects on a Team plan** and a new, empty project.
-   Pro is not enough — `firm-discovery` and `contact-extraction` need code
-   execution with network egress (web scraping), which Pro does not support.
-2. **Two connectors enabled in the project:**
+1. **A computer you have confirmed is clean and secured.** Do this one first. The
+   pipeline stores real people's names and work email addresses on your machine,
+   holds live Airtable and Gmail sessions plus your API keys, and drafts mail from
+   your own inbox. The businesses you contact never agreed to trust your computer,
+   so a compromised machine makes your outreach their breach. Full OS updates, a
+   **full** malware scan that comes back clean, unrecognized browser extensions and
+   startup items removed, disk encryption on. This applies to **Macs too** — the
+   malware that matters here steals browser sessions, keychain entries, and API
+   keys, and it is written for macOS as well as Windows. Full checklist and the
+   what-to-do-if-you-find-something steps are in
+   [`pre-flight-checklist.md`](./pre-flight-checklist.md), section 1. **On
+   CRAI-assisted deployments we confirm this before setup begins.**
+2. **A Claude account with Projects** — Pro, Max, Team, and Enterprise all work —
+   and a new, empty project. What actually matters is the **"Allow network egress"**
+   setting, which must be **"All domains"**: `firm-discovery` and
+   `contact-extraction` reach arbitrary firm websites, and the Serper, Hunter, and
+   Apollo calls go to third-party domains, so "package managers only" is not enough.
+   - **Pro and Max** have network access on by default, and you can set it yourself
+     under **Settings → Capabilities**.
+   - **Team and Enterprise** have it **off** by default; an **organization owner**
+     must allow all domains under **Organization settings → Capabilities**.
+   - See [Create and edit files with Claude](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude).
+3. **Two connectors enabled in the project:**
    - **Airtable** (all skills read/write here)
    - **Gmail** (required by the final step, email-generation)
-3. **An Airtable account** you control.
-4. **API keys:**
+4. **An Airtable account** you control.
+5. **API keys:**
    - **Serper** (required, for discovery) from serper.dev
    - **Hunter** (optional, for the contact-enrichment pass) from hunter.io
    - **Apollo** (required if you're running the **Corporate** segment, for
      `corporate-research`'s Apollo-backed Track A candidate search) from
      apollo.io — free tier is 75 credits/month, similar low volume to
      Hunter's; a paid plan is needed for real enrichment spend
-5. **The 6 run-flow skill files** from `install/`: `client-onboarding`,
+6. **The 6 run-flow skill files** from `install/`: `client-onboarding`,
    `voice-intake`, `firm-discovery`, `firm-review`, `contact-extraction`,
    `email-generation`. These are the pipeline, run in order.
    (`corporate-research` is **optional** — a Desktop research skill for clients
@@ -83,10 +102,13 @@ not access scoped to one already-existing base.
 
 ---
 
-## Step 2 — Upload the 6 skills
+## Step 2 — Upload the skills
 
-For each of the 6 `.skill` files: claude.ai → **Settings → Skills → Add Skill** →
-upload. Each installs once and is then available in any conversation.
+For each `.skill` file: claude.ai → **Settings → Skills → Add Skill** → upload.
+Each installs once and is then available in any conversation.
+
+Six for a Wedding-only client, seven if you are running the Corporate segment —
+add `corporate-research.skill`, which becomes step 4.3 below.
 
 ---
 
@@ -165,36 +187,90 @@ what happens next and what it'll ask you for.
   mainly used in Corporate copy — a Wedding template with only `{{travel}}` and
   no `{{firm}}` is correct, not a mistake. Templates must not include a greeting
   or signature (those are added automatically at send).
+- **Corporate clients approve two letters, not one.** Both are `segment:
+  Corporate`; they differ by **audience**. The `Agency` letter is written to an
+  event-planning business that books groups for a living. The `In-house` letter is
+  written to someone at an ordinary employer — a VP of People, an office manager —
+  who organizes maybe one offsite a year and does not plan events for a living.
+  Agency copy sent to an in-house reader praises a business they do not have, which
+  reads as a mistake. Approve both in this step if you plan to run
+  `corporate-research`'s Apollo search, because that is where in-house contacts
+  come from. Wedding clients approve one letter and are done.
 
-### 4.3 firm-discovery
+### 4.3 corporate-research *(Corporate segment only — skip for Wedding)*
+> "Run corporate-research for <City>."
+
+- **Run this before discovery**, not after. It builds the decision-maker profiles
+  that tell the later steps who to aim at, and its optional Apollo search is the
+  only way to reach in-house people that a Maps search cannot see.
+- Writes profiles to the **Corporate Research** table. `firm-discovery` reads that
+  table on a Corporate run and will offer to stop if it is empty.
+- The **Apollo step is optional and needs the Apollo key.** It searches Apollo's
+  People Search API for in-house decision-makers and writes them straight to
+  **Firms** and **Contacts** with `audience: In-house` — bypassing `firm-review`,
+  since "planner / venue / vendor" does not describe an ordinary employer. Its own
+  approval step is what gates those writes.
+- Two things it will tell you rather than hide: candidates whose size or type look
+  out of band are **flagged with a suggested skip** rather than dropped, and it
+  reports the **title distribution** it actually got back. Expect gaps — a live run
+  returned People/HR leadership and Chief of Staff but nothing for Executive
+  Assistant, Office Manager, or Operations Lead. A profile whose titles never come
+  back needs a sourcing path other than Apollo.
+- If your property's **capacity** is unpublished, that is fine. The headcount band
+  is just a search filter and defaults to 20-200; never invent a capacity to
+  satisfy it.
+
+### 4.4 firm-discovery
 > "Run firm-discovery for <City>, <segment>, small sample."
 
 - Geocodes the city, searches, returns **firm records as JSON**. Writes **nothing**
   to Airtable. Spends real Serper credits on real firms. Start with one city and
   one page as a smoke test.
 
-### 4.4 firm-review
+### 4.5 firm-review
 > "Review those discovery results and save the good ones to Firms."
 
 - Categorizes planner / venue / vendor, marks Keep / Review / Discard, and is the
   **only writer** to the Firms table — only the ones marked Keep get saved.
   Do not trust Google's "Type" label; the skill overrides it with name-level
-  judgment.
+  judgment. Everything it saves is marked **`audience: Agency`** — a Maps search
+  finds businesses, and a business that turns up under "wedding planner" plans
+  other people's events for a living.
+- Verdicts come back as a **numbered table with a link on every row** (the firm's
+  site, or a Maps search built from its name and city). Answer by row number.
+  **Resolve them in the same session** — the Reviews are not saved anywhere, so
+  ending the chat with rows outstanding loses them.
 
-### 4.5 contact-extraction
+### 4.6 contact-extraction
 > "Run contact-extraction on the Firms — pass 1 (scrape)."
 > Optional: "Run pass 2 (Hunter enrichment)."
 
-- Pass 1 scrapes each firm's site for an email (no key needed). Pass 2 uses Hunter
-  to recover named people and retry the misses (needs `hunter.key`; the free tier
-  is ~25–50 searches/month). Writes **Contacts** linked to their firm.
+- Pass 1 scrapes each firm's site for an email (no key needed) and **writes
+  Contacts as soon as the scrape finishes**, before you decide about Hunter, so a
+  closed tab or an ended session cannot lose the batch. Pass 2 uses Hunter to
+  recover named people and retry the misses (needs `hunter.key`; the free tier is
+  ~25–50 searches/month), and a step 6 reconciles those results into the rows
+  already written rather than duplicating them.
+- Pass 1 reports a **headline** ("10 of your 14 firms now have a contact email")
+  and names only the firms that came up empty. Firms it could not resolve are
+  skipped, not saved as blank-email rows — `email-generation` cannot send to those,
+  and the firm stays in **Firms** either way.
+- **Apollo-sourced contacts already have an email**, so this step passes over them.
+  Corporate agencies found through Maps run through it normally.
 
-### 4.6 email-generation
+### 4.7 email-generation
 > "Create one Gmail draft per Contact — drafts only, do not send."
 
 - Renders each template (greeting, travel line, firm lead-in, signature) and
   creates **Gmail drafts**. It never sends. The operator reviews and sends each
   draft from their own inbox.
+- Picks the template by matching **both** `segment` **and** `audience` on the firm.
+  A blank `audience` reads as `Agency`, so every pre-existing row keeps working.
+- **It stops rather than substituting.** An in-house contact with no in-house
+  template is a hard error, not a fall back to the agency letter — sending agency
+  copy to an in-house reader is the exact failure the audience split exists to
+  prevent. If you hit this, go back to `voice-intake` and approve the second
+  Corporate letter.
 
 ---
 

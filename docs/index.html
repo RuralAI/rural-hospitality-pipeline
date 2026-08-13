@@ -364,7 +364,8 @@
     <nav class="toc" aria-label="Contents">
       <h2>On this page</h2>
       <ol>
-        <li><a href="#keys"><span class="n">·</span>Before you begin</a></li>
+        <li><a href="#ready"><span class="n">·</span>Start here</a></li>
+        <li><a href="#keys"><span class="n">·</span>Get your keys</a></li>
         <li><a href="#how"><span class="n">·</span>How it works</a></li>
         <li><a href="#setup"><span class="n">·</span>Set up once</a></li>
         <li><a href="#find"><span class="n">1</span>Find planners</a></li>
@@ -377,10 +378,56 @@
     </nav>
 
     <main>
+      <!-- PREREQ READY -->
+      <section class="block" id="ready">
+        <div class="kicker"><span class="tag once">Do this first</span></div>
+        <h2 class="sec serif">Start here: your computer and your Claude account</h2>
+        <p class="sec-sub">Two checks before anything else. Both take minutes, and both are easier to do now than to discover halfway through your first campaign.</p>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">1</div>
+            <div>
+              <h3>Make sure the computer you'll use is clean</h3>
+              <p class="role">This one protects the businesses you're about to contact, not just you.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="sec-sub" style="margin-top:0">This pilot puts real people's names and work email addresses on your computer, stays signed in to your Airtable and Gmail, and writes drafts from your own inbox. The planners on your list never agreed to trust your machine. If it is compromised, your outreach becomes their problem, and it lands on your reputation and ours.</p>
+            <ul class="check" style="margin-top:14px">
+              <li><span class="mark">✓</span><span><strong>Install every pending update</strong> <span class="sub">and restart if it asks. On a Mac this is also what keeps Apple's built-in malware protection current.</span></span></li>
+              <li><span class="mark">✓</span><span><strong>Run a full virus scan and confirm it comes back clean.</strong> <span class="sub">A full scan, not a quick one. On Windows: <strong>Windows Security → Virus &amp; threat protection</strong> &mdash; check that real-time protection is on, then run the full scan from there.</span></span></li>
+              <li><span class="mark">✓</span><span><strong>Look through your browser extensions and startup programs.</strong> <span class="sub">Remove anything you do not recognize. This is where password-stealing software usually hides.</span></span></li>
+              <li><span class="mark">✓</span><span><strong>Turn on disk encryption and a screen lock.</strong> <span class="sub">BitLocker on Windows, FileVault on a Mac.</span></span></li>
+            </ul>
+            <div class="note"><span class="ic">!</span><span><strong>Using a Mac? This still applies to you.</strong> The kind of malware that matters here goes after saved browser logins, keychain passwords, and API keys, and it is written for Macs too. The risk is the same; only the antivirus tool differs.</span></div>
+            <div class="note"><span class="ic">!</span><span><strong>If a scan has ever found something on this computer</strong>, treat every password and key as taken. From a <em>different</em> computer you trust: change your Google and Airtable passwords, <strong>sign out of all active sessions</strong>, and regenerate your keys. Signing sessions out is the part that actually locks an intruder out &mdash; changing a password alone does not.</span></div>
+            <div class="note corp"><span class="ic">◆</span><span>If the Center for Rural AI is helping you set this up, we confirm this before we begin, not after.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="step-n serif">2</div>
+            <div>
+              <h3>Check your Claude account</h3>
+              <p class="role">Any paid plan works. One setting has to be right.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="sec-sub" style="margin-top:0">You need a Claude account with <strong>Projects</strong>. <strong>Pro, Max, Team, and Enterprise all work</strong> &mdash; there is no need to upgrade for this. What does matter is one setting, because the pilot has to reach planners' websites to read their contact pages.</p>
+            <ul class="check" style="margin-top:14px">
+              <li><span class="mark">✓</span><span><strong>Open Settings → Capabilities and set "Allow network egress" to "All domains."</strong> <span class="sub">The narrower "package managers only" option is not enough &mdash; Step 1 and Step 3 visit ordinary business websites, which that setting blocks.</span></span></li>
+            </ul>
+            <div class="note"><span class="ic">!</span><span><strong>On Pro or Max</strong>, this is already on by default and you can change it yourself. <strong>On Team or Enterprise</strong>, it is switched off by default and only an <strong>organization owner</strong> can turn it on, under <strong>Organization settings → Capabilities</strong>. If that is not you, this is the one thing to ask for before you start. <a class="lnk" href="https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude" target="_blank" rel="noopener">Anthropic's guide to the setting</a>.</span></div>
+          </div>
+        </div>
+      </section>
+
       <!-- PREREQ KEYS -->
       <section class="block" id="keys">
-        <div class="kicker"><span class="tag once">Do this first</span></div>
-        <h2 class="sec serif">Before you begin: get your three keys</h2>
+        <div class="kicker"><span class="tag once">Do this next</span></div>
+        <h2 class="sec serif">Then: get your three keys</h2>
         <p class="sec-sub">Quick, free signups that happen outside Claude (the third only if you're targeting corporate retreat planners). They take the longest, so grab them before you start and you won't have to stop partway through. Copy each key somewhere handy, like a notes app.</p>
         <div class="card">
           <div class="card-head">
@@ -462,7 +509,7 @@
             <li><span class="mark">✓</span><span><strong>Create a new project in Claude.</strong> <span class="sub">Name it something clear like "Email Outreach." Everything below lives inside this project.</span></span></li>
             <li><span class="mark">✓</span><span><strong>Connect Airtable and Gmail.</strong> <span class="sub">Settings → Connectors. This is where your list and your drafts live. Each one asks what Claude can access, and each asks differently. <strong>Airtable</strong> offers two choices: pick <strong>"Everything you have access to."</strong> <strong>Gmail</strong> shows a checklist: tick <strong>"Select all."</strong> Claude needs this much access to build your base and put drafts in your inbox.</span></span></li>
             <li><span class="mark">✓</span><span><strong>Download the skills, then add them.</strong> <span class="sub">Go to the <a class="lnk" href="https://github.com/RuralAI/rural-hospitality-pipeline" target="_blank" rel="noopener">project page on GitHub</a>, click the green <strong>Code</strong> button, choose <strong>Download ZIP</strong>, and unzip it. The files you need are in the <strong>install</strong> folder, one ".skill" file per skill. Then in Claude: Settings → Skills → Add Skill, and upload each one. They show up in every chat after that.</span></span></li>
-            <li><span class="mark">✓</span><span><strong>Put your keys in the Config table.</strong> <span class="sub">The Serper and Hunter keys from "Before you begin" (plus Apollo if you're running corporate-research). Once Claude has built your base in Step A, open it, go to the <strong>Config</strong> table, and paste each key into the cell under its heading. Do this once and every step afterwards finds its own key.</span></span></li>
+            <li><span class="mark">✓</span><span><strong>Put your keys in the Config table.</strong> <span class="sub">The Serper and Hunter keys from "Get your keys" (plus Apollo if you're running corporate-research). Once Claude has built your base in Step A, open it, go to the <strong>Config</strong> table, and paste each key into the cell under its heading. Do this once and every step afterwards finds its own key.</span></span></li>
           </ul>
         </div>
 
@@ -504,6 +551,7 @@
               <dt>Action</dt><dd>Claude asks how you write, then drafts your email templates and shows them to you.</dd>
               <dt>You approve</dt><dd>Read the drafts, ask for any tweaks, and approve. These become the emails you send later.</dd>
             </dl>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment: you approve two letters here, not one.</strong> They go to two different kinds of reader. An <em>agency</em> plans other people's events for a living, so that letter can talk about their work booking groups. An <em>in-house</em> contact &mdash; the HR director or office manager Apollo finds in <strong>Step 2</strong> &mdash; organizes maybe one retreat a year. Sending them the agency letter compliments them on a business they do not have, which reads as a mistake. Claude drafts both; read both. Wedding-only? One letter, and you are done.</span></div>
           </div>
         </div>
 
@@ -552,7 +600,7 @@
               <dt>Action</dt><dd>Claude finds the planners in that area and lists them. Nothing is saved yet.</dd>
               <dt>You approve</dt><dd>Nothing &mdash; just look. Fill in the city and segment you're targeting. Keep <strong>small sample</strong> in the prompt: it tells Claude to pull just a first batch (about one page of firms) instead of a full run, so you can check quality and spend before going bigger.</dd>
             </dl>
-            <div class="note"><span class="ic">!</span><span>Before your first run, put your <strong>Serper key</strong> in Airtable rather than pasting it into the chat. Open your base, go to the <strong>Config</strong> table, and paste the key into the cell under the <strong>serper-api-key</strong> heading. Claude picks it up from there every run, so you only do this once. While you are in there you can fill in <strong>hunter-api-key</strong> and <strong>apollo-api-key</strong> too, using the keys from "Before you begin," and later steps will just work.</span></div>
+            <div class="note"><span class="ic">!</span><span>Before your first run, put your <strong>Serper key</strong> in Airtable rather than pasting it into the chat. Open your base, go to the <strong>Config</strong> table, and paste the key into the cell under the <strong>serper-api-key</strong> heading. Claude picks it up from there every run, so you only do this once. While you are in there you can fill in <strong>hunter-api-key</strong> and <strong>apollo-api-key</strong> too, using the keys from "Get your keys," and later steps will just work.</span></div>
             <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment:</strong> put <em>Corporate</em> in the prompt where it says segment, and finish <strong>Card C</strong> first. Corporate searches three phrasings per city instead of the one wedding uses, so it spends about three times the Serper credits. That is normal, and the small sample wording keeps the first run cheap.</span></div>
           </div>
         </div>
@@ -636,6 +684,7 @@
               <dt>You approve</dt><dd>Move to the last step to review them.</dd>
             </dl>
             <div class="note good"><span class="ic">✓</span><span>Claude <strong>never sends</strong> anything. Every email waits in your Drafts until you send it yourself.</span></div>
+            <div class="note corp"><span class="ic">◆</span><span><strong>Corporate segment:</strong> each contact gets the letter written for their kind of reader &mdash; agency or in-house &mdash; picked automatically. If you skipped the in-house letter back in <strong>Card B</strong>, this step <strong>stops and tells you</strong> rather than sending the agency letter instead. Go back, approve the second letter, and run this again.</span></div>
           </div>
         </div>
       </section>
@@ -659,7 +708,7 @@
         <h2 class="sec serif">Good to know</h2>
         <div class="tip-row">
           <div class="note good"><span class="ic">✓</span><span><strong>Start small.</strong> Run one city as a sample first. You'll see the quality before spending on a bigger search.</span></div>
-          <div class="note good"><span class="ic">✓</span><span><strong>Setup is one-time.</strong> Steps A and B happen once for your business. Steps 1&ndash;4 are what you repeat for each campaign.</span></div>
+          <div class="note good"><span class="ic">✓</span><span><strong>Setup is one-time.</strong> Cards A and B happen once for your business (plus C if you run the corporate segment). Steps 1&ndash;4 are what you repeat for each campaign.</span></div>
           <div class="note"><span class="ic">!</span><span><strong>If a step stalls,</strong> just try it again, or reopen the project in a browser. It's usually a hiccup, not a real error.</span></div>
           <div class="note good"><span class="ic">✓</span><span><strong>Nothing goes out without you.</strong> The pilot only ever prepares drafts. You send from your own inbox.</span></div>
         </div>
