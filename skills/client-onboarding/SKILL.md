@@ -27,6 +27,20 @@ client's own Airtable base, read at runtime by the four pipeline skills.
 
 ## Step 0: Provision the Airtable base
 
+**Before anything else, check what you can actually reach:**
+
+| What's available | What to do |
+| --- | --- |
+| `table-schema.mjs` present, code execution on, Airtable connector connected | Normal path below. |
+| `table-schema.mjs` present, code execution off | Read `table-schema.mjs` as plain text instead of running `plan-tables.mjs` - it is real code, but written to stay readable - and provision from the field definitions in it. |
+| `table-schema.mjs` missing | Stop. Tell the operator to re-upload the latest `client-onboarding.skill` and start a new conversation. Do not guess field names from memory. |
+| Airtable connector missing, or connected at single-base scope | Stop. Tell the operator to connect Airtable with workspace-level access (`docs/pre-flight-checklist.md`, section 3) - the base does not exist yet, so single-base scoping cannot reach it. |
+
+Never substitute another client's or another pilot's schema file, and never guess a
+field name to route around a missing one: a guessed name produces a base that looks
+finished and fails silently on the first write, which is worse than not
+provisioning at all.
+
 The pipeline needs eight tables: Firms, Contacts, Outreach, Email Templates,
 Region Travel, Region Naming, Config, Business Profile. Clients running the
 Corporate segment get a ninth, Corporate Research (written by the
@@ -51,10 +65,43 @@ base yourself with `create_base`, which makes the base and all its tables and
    (always a text type), and any field carrying a `linkTo` key is a link to
    another table.
 
-3. **Decide fresh vs. existing base.** If the operator already has a base for
-   this client from a previous run, get its base id (`app...`, from the base
-   URL) and go to step 6 (top-up). Otherwise create it fresh (steps 4-5). Never
-   create a second base for a client that already has one.
+3. **Decide the mode: Fresh, Reconcile, or Upgrade.** If the operator already has
+   a base for this client from a previous run, get its base id (`app...`, from
+   the base URL) and read its `Config` table. Otherwise (no base at all) this is
+   **Fresh** - go to steps 4-5.
+
+   With an existing base, read the single Config row's `installer-version` field:
+
+   - **The `Config` table has no `installer-version` field, or the field is
+     blank.** This is a **pre-stamp install**, not Fresh - the base already has
+     real client data, it just predates this field. Do not re-provision it as
+     new. Add the field to `Config` (`create_field`, single line text) if it
+     is not already there, then write the literal value
+     `unknown (pre-stamp install)` into the one Config row (create that row if
+     Config has none yet; never touch any other row or table while doing this).
+     Tell the operator plainly: "This base predates version stamping, so I
+     can't tell what version last touched it. I'm recording that and treating
+     this as a routine reconcile." Then go to step 6 (top-up).
+   - **The field has a value.** Parse it as semver and compare to this skill's
+     own version (the `**Version:**` line at the top of this file). A value
+     that does not parse as semver - including the `unknown (pre-stamp install)`
+     literal a prior run may have written - sorts as older than every real
+     version; it needs no special case, the "older" branch below already
+     covers it.
+     - **Equal to this skill's version → Reconcile.** Go to step 6 (top-up);
+       nothing about the mode changes what top-up does.
+     - **Older than this skill's version → Upgrade.** Tell the operator the
+       base is stamped at an older version than this skill, naming both
+       versions. **Do not proceed automatically** - ask whether they want to
+       continue. If they decline, stop here without changing anything. If they
+       confirm, go to step 6 (top-up), then afterward update
+       `installer-version` to this skill's current version. (This skill does
+       not yet implement version-specific upgrade behavior beyond the additive
+       top-up in step 6 - see `docs/installer-conformance.md`, items 4 and 5,
+       for what real Upgrade-mode handling would still add.)
+
+   Never create a second base for a client that already has one, regardless of
+   mode.
 
 4. **Create the base (fresh run).** Ask which workspace to create it in
    (`list_workspaces` if the operator is unsure; a workspace id is `wsp...`).
@@ -86,6 +133,12 @@ base yourself with `create_base`, which makes the base and all its tables and
 7. **The one manual field.** Tell the operator to add it by hand - Airtable's API
    cannot create Created-time fields: open the Firms table, add a field, choose
    "Created time", name it exactly `discovered-date`.
+
+8. **Write the deployment stamp (Fresh installs only).** After step 7, write one
+   Config row with `installer-version` set to this skill's own version. Create
+   the row if none exists yet; leave the API key fields blank for the operator
+   to fill in later. The Reconcile and Upgrade branches in step 3 already wrote
+   or left this field correctly - do not touch it again here.
 
 Re-running is safe: an existing base is topped up, not duplicated.
 
@@ -178,5 +231,6 @@ along the positioning notes so its template-drafting step can use them.
 
 - It does not write any `config/*` file. All output is in Airtable.
 - It does not capture voice or draft email templates - that is `voice-intake`.
-- It does not populate the Config table (service API keys) - the operator fills
-  that single row in by hand per `docs/key-handling-standard.md`.
+- It writes only `installer-version` in Config (Step 0's deployment stamp). The
+  service API key fields are never populated by this skill - the operator fills
+  those in by hand per `docs/key-handling-standard.md`.

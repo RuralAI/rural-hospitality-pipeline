@@ -1,5 +1,12 @@
 Rural Hospitality Outreach Pipeline
 Copyright 2026 Center for Rural AI
 
+This product includes software developed at the
+Center for Rural AI (https://ruralai.org).
+
+Third-party notices: none. This repo has no runtime dependencies (see
+package.json) and bundles no vendored or borrowed third-party code, so no
+attribution beyond this file is required.
+
 Licensed under the Apache License, Version 2.0.
 See the LICENSE file in this repository.

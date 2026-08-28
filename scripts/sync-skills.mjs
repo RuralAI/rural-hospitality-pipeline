@@ -33,7 +33,7 @@ const check = process.argv.includes("--check");
 
 function banner(from) {
   return (
-    `// AUTO-GENERATED from ${from} by scripts/sync-skills.mjs — do not edit.\n` +
+    `// AUTO-GENERATED from ${from} by scripts/sync-skills.mjs; do not edit.\n` +
     `// Edit the source and re-run: npm run sync:skills\n\n`
   );
 }

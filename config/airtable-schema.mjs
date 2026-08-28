@@ -148,6 +148,7 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
       { name: "serper-api-key", type: "singleLineText" },
       { name: "hunter-api-key", type: "singleLineText" },
       { name: "apollo-api-key", type: "singleLineText" },
+      { name: "installer-version", type: "singleLineText" },
     ],
   };
 
