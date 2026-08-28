@@ -1,4 +1,4 @@
-// AUTO-GENERATED from config/airtable-schema.mjs by scripts/sync-skills.mjs — do not edit.
+// AUTO-GENERATED from config/airtable-schema.mjs by scripts/sync-skills.mjs; do not edit.
 // Edit the source and re-run: npm run sync:skills
 
 /**
@@ -151,6 +151,7 @@ export function buildTableDefinitions(segments, { includeReview = false } = {}) 
       { name: "serper-api-key", type: "singleLineText" },
       { name: "hunter-api-key", type: "singleLineText" },
       { name: "apollo-api-key", type: "singleLineText" },
+      { name: "installer-version", type: "singleLineText" },
     ],
   };
 

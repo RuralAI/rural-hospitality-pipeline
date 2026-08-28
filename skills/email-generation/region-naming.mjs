@@ -1,4 +1,4 @@
-// AUTO-GENERATED from config/region-naming.js by scripts/sync-skills.mjs — do not edit.
+// AUTO-GENERATED from config/region-naming.js by scripts/sync-skills.mjs; do not edit.
 // Edit the source and re-run: npm run sync:skills
 
 /**

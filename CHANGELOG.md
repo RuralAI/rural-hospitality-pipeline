@@ -14,11 +14,31 @@ Version numbers cover all seven skills at once and are defined in
 
 ## [Unreleased]
 
-Nothing yet.
+**Operator impact (when this ships):** Reinstall: client-onboarding. Adds an
+`Installer Version` field to Config; existing bases are backfilled on next run and
+no other data is touched.
+
+### Added
+- `client-onboarding` writes an `installer-version` deployment stamp to Config, and
+  now opens Step 0 with a capability check (schema file, code execution, Airtable
+  connector) before provisioning begins. See `docs/installer-conformance.md` for
+  what CRAI's installer standard still requires beyond this (items 4, 5, 7, 8).
+- `docs/installer-standard.md` and `docs/installer-conformance.md`: the CRAI
+  installer standard and this repo's honest ledger against it.
+- `CONTRIBUTING.md`: the build process, source-of-truth layout, and CI checks,
+  now documented in one place instead of split across `CLAUDE.md` and memory.
+- `.github/workflows/checks.yml`: CI now runs the seven checks CONTRIBUTING.md
+  documents on every push and pull request.
+
+### Follow-up (not implemented yet)
+- The drafting skills (`voice-intake` / `email-generation`) need an explicit
+  "never use em dashes in draft copy" instruction in their own `SKILL.md`, plus a
+  check on their own output before handing a draft over. CI cannot see generated
+  email drafts, so that instruction is the only thing actually protecting them.
 
 ---
 
-## [2.0.0] — 2026-08-12
+## [2.0.0] - 2026-08-12
 
 **Operator impact:** Reinstall all skills, and reconcile the schema on any base
 created by 1.0.0. Three fields are new or changed: an `"Apollo"` choice on
@@ -388,7 +408,7 @@ other people's contact data on.
 
 ---
 
-## [1.0.0] — 2026-07-26
+## [1.0.0] - 2026-07-26
 
 Initial public release of the Rural Hospitality Outreach Pipeline as a reusable
 open template by the Center for Rural AI.

@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/pipeline/stage-02-hunter.js by scripts/sync-skills.mjs — do not edit.
+// AUTO-GENERATED from src/pipeline/stage-02-hunter.js by scripts/sync-skills.mjs; do not edit.
 // Edit the source and re-run: npm run sync:skills
 
 /**
